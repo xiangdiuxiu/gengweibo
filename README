@@ -1,0 +1,8 @@
+简要说明
+
+下载源码之后，如何在本地部署：
+1、找到src目录下的oauth.properties，依次填写你在各个微博开放平台申请到的oauth key和secret
+2、在doc目录下找到sql文件(本系统目前仅支持mysql)，创建数据库和相应的表格，同时注意根据你
+机器的配置修改src目录下的database.properties文件，里面是mysql的一些参数。
+3、把项目部署到tomcat或resin等servlet容器中，假设是在localhost8080端口，并且项目名称是gengweibo，
+那么访问http://localhost:8080/gengweibo即可。
