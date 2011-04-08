@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	
+	<error-page>
+		<exception-type>java.lang.Exception</exception-type>
+		<location>/error.jsp</location>
+	</error-page>
+	
+	<filter>
+		<filter-name>SessionFilter</filter-name>
+		<filter-class>com.gengweibo.web.SessionFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>SessionFilter</filter-name>
+		<url-pattern>/execute.do</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+		<filter-name>CharsetFilter</filter-name>
+		<filter-class>z.action.CharsetFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>CharsetFilter</filter-name>
+		<url-pattern>/execute.do</url-pattern>
+	</filter-mapping>
+	
+	<servlet>
+		<servlet-name>Log4jInit</servlet-name>
+		<servlet-class>z.action.Log4jInit</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>GuiceInit</servlet-name>
+		<servlet-class>com.gengweibo.web.GuiceInit</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>Dispatcher</servlet-name>
+		<servlet-class>com.gengweibo.web.WeiDispatcher</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>Dispatcher</servlet-name>
+		<url-pattern>/execute.do</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
