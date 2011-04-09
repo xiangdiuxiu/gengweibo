@@ -9,7 +9,10 @@
 3、混合显示，同时把各微博厂商的微博混合在同一个页面按时间降序来显示，区别于其他多微博查看工具的tab切换方式。
 4、功能较少，只方便查看“我”或“我所关注的人”的微博，不利于网友互动。
 
-三、如何本地部署
+三、所用技术
+1、java平台；容器使用了Google的Guice(我不喜欢用spring，感觉太庞大了)；dao用jdbc直接搞定；mvc用自己基于servlet封装的一个简单的dispatcher。
+
+四、如何本地部署
 1、下载源码。
 2、找到src目录下的oauth.properties，依次填写你在各个微博开放平台申请到的oauth key和secret。
 3、在源码doc目录下找到db.sql文件(系统基于mysql)，创建数据库和相应的表格，同时注意根据你机器的配置修改src目录下的database.properties文件，里面是mysql链接的一些参数。
