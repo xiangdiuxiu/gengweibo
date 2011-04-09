@@ -11,7 +11,12 @@
 5、页面非常简陋(不过个人认为还算简洁，至少够我用了，哈哈)，如果想预先看看效果图，可以下载源码到本地，进入doc目录查看。
 
 三、所用技术
-1、java平台；容器使用了Google的Guice(我不喜欢用spring，感觉太庞大了)；dao用jdbc直接搞定；mvc用自己基于servlet封装的一个简单的dispatcher。
+1、后台基于java
+ 1) 容器使用了Google的Guice(我不喜欢用spring，感觉太庞大了)。
+ 2) dao暂时直接用jdbc直接搞定，因为crud相关部分目前也太简单了，所以也没使用ibatis之类的框架。
+ 3) mvc也是暂未使用框架，用了自己基于servlet封装的一个简单的dispatcher。
+2、前台相关
+ 1) jquery以及其他jquery插件
 
 四、如何本地部署
 1、下载源码。
@@ -20,4 +25,4 @@
 4、把项目部署到tomcat或resin等servlet容器中，假设是在localhost的8080端口，并且项目名称是gengweibo，那么访问 http://localhost:8080/gengweibo 即可。
 
 
-如有疑问或建议，欢迎到新浪微博联系 http://weibo.com/zhengll
+如有疑问或建议，欢迎到新浪微博联系 http://t.sina.com.cn/zhengll

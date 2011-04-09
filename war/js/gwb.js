@@ -17,6 +17,13 @@ function getContext() {
 	return CONTEXT;
 }
 
+function encode(value) {
+	if (value) {
+		return encodeURI(value);
+	}
+	return value;
+}
+
 function render(html, argMap) {
 	for (var i in argMap) {
 		var key = '${' + i + '}';
@@ -494,7 +501,7 @@ function moreHomeTimeline() {
 }
 
 function tip(msg) {
-	alert(msg);
+	$.growlUI(null, msg);
 }
 
 function tipError(msg) {
@@ -502,7 +509,7 @@ function tipError(msg) {
 }
 
 function tipSuccess(msg) {
-	$.growlUI(null, msg);
+	tip(msg);
 }
 
 function statusesUpdate() {
@@ -510,7 +517,7 @@ function statusesUpdate() {
 	if (status && status.length > 0) {
 		if (status.length > 0 && status.length <= 140) {
 			$.post(getContext() + '/execute.do?api=statusesUpdate', {
-				'status' : status
+				'status' : encode(status)
 			}, function(data) {
 				if (data && 'true' == data['status']) {
 					tipSuccess("成功发布微博");
@@ -521,10 +528,13 @@ function statusesUpdate() {
 			resetTextarea();
 		} else if (status.length < 1) {
 			resetTextarea();
-			tipError("未输入内容！");
+			tip("未输入内容！");
 		} else {
 			tipError("已经超出" + Math.abs(140 - status.length) + "个字");
 		}
+	} else {
+		resetTextarea();
+		tip("未输入内容！");
 	}
 }
 
@@ -545,11 +555,11 @@ function resetTextarea() {
 	$("#remainWordCount").css('color','black').html("还可以输入140个字");
 }
 
-function statusUpdate() {
-	var status = $.trim($("#statusTextarea").val());
-	alert("status:" + status);
-	resetTextarea();
-}
+//function statusUpdate() {
+//	var status = $.trim($("#statusTextarea").val());
+//	alert("status:" + status);
+//	resetTextarea();
+//}
 
 function getWeiboIdAndStatusId(tar) {
 	var topDiv = $(tar).parent().parent().parent().parent().parent();
@@ -575,6 +585,10 @@ function statusesRetweet(tar) {
 			}
 		} else if (ws.weiboId.substring(0, 6) == "T_SOHU") {
 			postArg['status'] = "转发微博。 " + ws.rt;
+		}
+		
+		if (postArg['status']) {
+			postArg['status'] = encode(postArg['status']);
 		}
 	}
 	$.post(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
@@ -748,7 +762,7 @@ function statusesReply(tar) {
 					$.post(getContext() + '/execute.do?api=statusesReply', {
 						'weiboId' : ws.weiboId,
 						'statusId' : ws.statusId,
-						'status' : reply
+						'status' : encode(reply)
 					}, function(data) {
 						if (data && 'true' == data['status']) {
 							tipSuccess("成功发布评论");
@@ -790,6 +804,7 @@ function finishViewStatusImg(tar) {
 }
 
 function initMainPage() {
+	WEIBO_MAP = {};
 	initLoadHomeTimeline();
 	flushPage();
 }
