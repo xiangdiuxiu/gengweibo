@@ -15,6 +15,7 @@
  1) 容器使用了Google的Guice(我不喜欢用spring，感觉太庞大了)。
  2) dao暂时直接用jdbc直接搞定，因为crud相关部分目前也太简单了，所以也没使用ibatis之类的框架。
  3) mvc也是暂未使用框架，用了自己基于servlet封装的一个简单的dispatcher。
+ 4) oauth java api。未使用各微博厂商的sdk，直接使用了 http://oauth.googlecode.com/svn/code/java/
 2、前台相关
  1) jquery以及其他jquery插件
 
