@@ -13,7 +13,7 @@ import z.action.Result;
  * @since 2011-3-10
  */
 public class FlushAction extends ActionSupport {
-	private static final Result RESULT = new Result("/index.jsp");
+	private static final Result RESULT = new Result("/WEB-INF/jsp/result.jsp").addValue("result", "{\"status\":\"ok\"}");
 	
 	@Api("flush")
 	public Result flush() {

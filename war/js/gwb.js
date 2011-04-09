@@ -31,6 +31,20 @@ function tobeImpl() {
 	return false;
 }
 
+var flushPageInterval = null;
+function flushPage() {
+	if (flushPageInterval) {
+		clearInterval(flushPageInterval);
+	}
+	
+	flushPageInterval = setInterval(function() {
+		$.post(getContext() + '/execute.do?api=flush', {
+		}, function(data){
+			
+		}, "json");
+	}, 1000 * 60 * 5);
+}
+
 function formatFromTimestamp(timestamp) {
 	var diff = new Date().getTime() - Number(timestamp);
 
@@ -164,6 +178,7 @@ function loadHomeTimeline(url, argMap) {
 					var from = null;
 					var retweetCount = null;
 					var commentsCount = null;
+					var rt = null; // 转发时，需要附带的内容
 					
 					if (weiboId.substring(0, 5) == "T_163") {
 						statusId = theWeibo['id'];
@@ -188,6 +203,7 @@ function loadHomeTimeline(url, argMap) {
 						from = "<img src='" + getContext() + "/css/from163.png' title='内容来自网易微博[" + weiboAccountName + "]' />";
 						retweetCount = theWeibo['retweet_count'];
 						commentsCount = theWeibo['comments_count'];
+						rt = "";
 					
 					} else if (weiboId.substring(0, 6) == "T_SINA") {
 						statusId = theWeibo['id'];
@@ -204,9 +220,11 @@ function loadHomeTimeline(url, argMap) {
 						statusImg = (theWeibo['thumbnail_pic'] || "");
 						statusRef = "";
 						statusRefUserName = "";
+						rt = "";
 						if (theWeibo['retweeted_status']) {
 							statusRef = convertStatusSina(theWeibo['retweeted_status']['text'])['status'];
 							statusRefUserName = theWeibo['retweeted_status']['user']['name'];
+							rt = "//@" + userName + ": " + theWeibo['text'];
 						}
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
@@ -245,6 +263,7 @@ function loadHomeTimeline(url, argMap) {
 						from = "<img src='" + getContext() + "/css/fromqq.png' title='内容来自腾讯微博[" + weiboAccountName + "]' />";
 						retweetCount = "";
 						commentsCount = theWeibo['count'];
+						rt = "";
 						
 					} else if (weiboId.substring(0, 6) == "T_SOHU") {
 						statusId = theWeibo['id'];
@@ -255,8 +274,10 @@ function loadHomeTimeline(url, argMap) {
 						statusImg = (theWeibo['middle_pic'] || "");
 						statusRef = theWeibo['in_reply_to_status_text'] || "";
 						statusRefUserName = theWeibo['in_reply_to_screen_name'] || "";
+						rt = "";
 						if (statusRef && "" != statusRef) {
 							statusRef = convertStatusSohu(statusRef)['status'];
+							rt = "//@" + userName + ": " + theWeibo['text'];
 						}
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
@@ -290,7 +311,8 @@ function loadHomeTimeline(url, argMap) {
 						'timestamp' : timestamp,
 						'from' : from,
 						'retweetCount' : retweetCount,
-						'commentsCount' : commentsCount
+						'commentsCount' : commentsCount,
+						'rt' : rt
 					});
 					
 				}
@@ -338,7 +360,7 @@ function loadHomeTimeline(url, argMap) {
 				
 				var createTime = formatFromTimestamp(local.timestamp);
 				
-				htmlArray.push("<div class='item' id='", local.weiboId, "XXX", local.statusId, "'>");
+				htmlArray.push("<div class='item' id='", local.weiboId, "XXX", local.statusId, "' rt='", local.rt, "'>");
 				htmlArray.push("<div class='item-1'><div title='", local.userName, "' class='userHeader f-left'><img src='", local.userHeader, "' /></div>");
 				
 				htmlArray.push("<div class='userItem f-right'><div class='userStatus'>");
@@ -446,7 +468,7 @@ function initLoadHomeTimeline() {
 }
 
 function moreHomeTimeline() {
-	var postArg = {}
+	var postArg = {};
 	for (var weiboId in WEIBO_MAP) {
 		var weibo = WEIBO_MAP[weiboId];
 		if (weibo['since_id']) {
@@ -534,15 +556,28 @@ function getWeiboIdAndStatusId(tar) {
 	var ids = topDiv.attr("id").split('XXX');
 	var weiboId = ids[0];
 	var statusId = ids[1];
-	return {'weiboId':weiboId, 'statusId':statusId};
+	return {'weiboId':weiboId, 'statusId':statusId, 'rt':topDiv.attr("rt")};
 }
 
 function statusesRetweet(tar) {
 	var ws = getWeiboIdAndStatusId(tar);
-	$.post(getContext() + '/execute.do?api=statusesRetweet', {
+	var postArg = {
 		'weiboId' : ws.weiboId,
 		'statusId' : ws.statusId
-	}, function(data) {
+	};
+	if (ws.rt && "" != ws.rt) {
+		if (ws.weiboId.substring(0, 6) == "T_SINA") {
+			if (ws.rt.length > 140) {
+				tipError("转发微博失败"); // TODO 
+				return;
+			} else {
+				postArg['status'] = ws.rt;
+			}
+		} else if (ws.weiboId.substring(0, 6) == "T_SOHU") {
+			postArg['status'] = "转发微博。 " + ws.rt;
+		}
+	}
+	$.post(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
 		if (data && 'true' == data['status']) {
 			tipSuccess("成功转发微博");
 		} else {
@@ -756,6 +791,7 @@ function finishViewStatusImg(tar) {
 
 function initMainPage() {
 	initLoadHomeTimeline();
+	flushPage();
 }
 
 function statusesFlush() {

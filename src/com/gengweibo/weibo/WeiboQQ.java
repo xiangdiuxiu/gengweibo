@@ -58,7 +58,7 @@ public class WeiboQQ extends Weibo implements IWeibo {
 	}
 
 	public Response homeTimeline(IParam param) {
-		RequestParam reqParam = toRequestParam("reqnum", PAGE_MAX).add("format", "json");
+		RequestParam reqParam = toRequestParam("reqnum", parseLegalPageCount(param.getParamValue("count"))).add("format", "json");
 		
 		if (null != param.getParamValue("pagetime")) {
 			reqParam.add("pagetime", param.getParamValue("pagetime"));
@@ -136,18 +136,22 @@ public class WeiboQQ extends Weibo implements IWeibo {
 	public Response statusesReply(IParam param) {
 		String id = param.getParamValue("statusId");
 		String status = param.getParamValue("status");
-		return sendRequest(toRequestParam("format", "json").add("reid", id).add("content", status), urlResource + "t/re_add", POST);
+		return sendRequest(toRequestParam("format", "json").add("reid", id).add("content", status).add("clientip", param.getParamValue("clientip")), urlResource + "t/re_add", POST);
 	}
 
 	public Response statusesRetweet(IParam param) {
 		String id = param.getParamValue("statusId");
-		return sendRequest(toRequestParam("format", "json").add("reid", id), urlResource + "t/re_add", POST);
+		
+		RequestParam reqParam = toRequestParam("format", "json").add("reid", id).add("clientip", param.getParamValue("clientip"));
+		if (null != param.getParamValue("status")) {
+			reqParam.add("content", param.getParamValue("status"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "t/re_add", POST);
 	}
 
 	public Response statusesUpdate(IParam param) {
-		String status = param.getParamValue("status");
-		String clientip = param.getParamValue("clientip");
-		return sendRequest(toRequestParam("format", "json").add("content", status).add("clientip", clientip), urlResource + "t/add", POST);
+		return sendRequest(toRequestParam("format", "json").add("content", param.getParamValue("status")).add("clientip", param.getParamValue("clientip")), urlResource + "t/add", POST);
 	}
 	
 	public Response verifyCredentials() {

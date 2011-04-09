@@ -24,8 +24,7 @@ public class WeiboSina extends Weibo implements IWeibo {
 	}
 	
 	public Response statusesComments(IParam param) {
-		RequestParam reqParam = new RequestParam();
-		reqParam.add("count", PAGE_MAX).add("id", param.getParamValue("statusId"));
+		RequestParam reqParam = toRequestParam("count", PAGE_MAX).add("id", param.getParamValue("statusId"));
 		String page = "1";
 		if (null != param.getParamValue("page")) {
 			page = param.getParamValue("page");
@@ -35,7 +34,13 @@ public class WeiboSina extends Weibo implements IWeibo {
 	}
 	
 	public Response statusesRetweet(IParam param) {
-		return sendRequest(toRequestParam("id", param.getParamValue("statusId")), urlResource + "statuses/retweet.json", POST);
+		RequestParam reqParam = toRequestParam("id", param.getParamValue("statusId"));
+		
+		if (null != param.getParamValue("status")) {
+			reqParam.add("status", param.getParamValue("status"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "statuses/repost.json", POST);
 	}
 	
 	public Response statusesReply(IParam param) {

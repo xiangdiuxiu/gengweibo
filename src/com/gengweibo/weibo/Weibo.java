@@ -50,8 +50,8 @@ public abstract class Weibo implements IWeibo, Serializable {
 
 	private static final long serialVersionUID = -5519577190711442534L;
 	
-	/** 分页参数，每页20条，每次获取20条数据 */
-	protected static final String PAGE_MAX = "20";
+	/** 分页参数，每页20条，每次最多可以获取20条数据 */
+	protected static final int PAGE_MAX = 20;
 	
 	protected OAuthAccessor accessor;
 	
@@ -72,6 +72,20 @@ public abstract class Weibo implements IWeibo, Serializable {
 	 * 微博账户ID格式(type_userIdorUserName): T_163_123123, T_QQ_zzzz,  T_SINA_1231235
 	 */
 	protected String weiboId;
+	
+	protected int parseLegalPageCount(String value) {
+		if (null != value) {
+			try {
+				int i = Integer.valueOf(value.trim());
+				if (i > 0 && i < PAGE_MAX) {
+					return i;
+				}
+			} catch (NumberFormatException e) {
+			}
+		}
+
+		return PAGE_MAX;
+	}
 	
 	public Weibo(String urlRequest, String urlAuthorization, String urlAccess,
 			String urlResource, String urlCallback, String consumerKey,
@@ -147,8 +161,7 @@ public abstract class Weibo implements IWeibo, Serializable {
 	}
 	
 	public Response homeTimeline(IParam param) {
-		RequestParam reqParam = new RequestParam();
-		reqParam.add("count", PAGE_MAX);
+		RequestParam reqParam = toRequestParam("count", parseLegalPageCount(param.getParamValue("count")));
 		
 		if (null != param.getParamValue("since_id")) {
 			reqParam.add("since_id", param.getParamValue("since_id"));
@@ -203,8 +216,7 @@ public abstract class Weibo implements IWeibo, Serializable {
 	}
 
 	public Response statusesComments(IParam param) {
-		RequestParam reqParam = new RequestParam();
-		reqParam.add("count", PAGE_MAX);
+		RequestParam reqParam = toRequestParam("count", PAGE_MAX);
 		if (null != param.getParamValue("since_id")) {
 			// 163可选参数，该参数需传微博id，返回此条索引之后发的微博列表，不包含此条；
 			reqParam.add("since_id", param.getParamValue("since_id"));
@@ -225,7 +237,13 @@ public abstract class Weibo implements IWeibo, Serializable {
 
 	public Response statusesRetweet(IParam param) {
 		String id = param.getParamValue("statusId");
-		return sendRequest(null, urlResource + "statuses/retweet/" + id + ".json", POST);
+		
+		RequestParam reqParam = null;
+		if (null != param.getParamValue("status")) {
+			reqParam = toRequestParam("status", param.getParamValue("status"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "statuses/retweet/" + id + ".json", POST);
 	}
 	
 	public Response statusesUpdate(IParam param) {

@@ -62,8 +62,7 @@ public class WeiboSohu extends Weibo implements IWeibo {
 	}
 
 	public Response homeTimeline(IParam param) {
-		RequestParam reqParam = new RequestParam();
-		reqParam.add("count", PAGE_MAX);
+		RequestParam reqParam = toRequestParam("count", parseLegalPageCount(param.getParamValue("count")));
 		
 		if (null != param.getParamValue("max_id")) {
 			reqParam.add("max_id", param.getParamValue("max_id"));
@@ -73,8 +72,7 @@ public class WeiboSohu extends Weibo implements IWeibo {
 	}
 	
 	public Response statusesComments(IParam param) {
-		RequestParam reqParam = new RequestParam();
-		reqParam.add("count", PAGE_MAX);
+		RequestParam reqParam = toRequestParam("count", PAGE_MAX);
 		String page = "1";
 		if (null != param.getParamValue("page")) {
 			page = param.getParamValue("page");
@@ -93,6 +91,12 @@ public class WeiboSohu extends Weibo implements IWeibo {
 
 	public Response statusesRetweet(IParam param) {
 		String id = param.getParamValue("statusId");
-		return sendRequest(null, urlResource + "statuses/transmit/" + id + ".json", POST);
+		
+		RequestParam reqParam = null;
+		if (null != param.getParamValue("status")) {
+			reqParam = toRequestParam("status", param.getParamValue("status"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "statuses/transmit/" + id + ".json", POST);
 	}
 }
