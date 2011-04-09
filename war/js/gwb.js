@@ -555,12 +555,6 @@ function resetTextarea() {
 	$("#remainWordCount").css('color','black').html("还可以输入140个字");
 }
 
-//function statusUpdate() {
-//	var status = $.trim($("#statusTextarea").val());
-//	alert("status:" + status);
-//	resetTextarea();
-//}
-
 function getWeiboIdAndStatusId(tar) {
 	var topDiv = $(tar).parent().parent().parent().parent().parent();
 	var ids = topDiv.attr("id").split('XXX');
