@@ -527,7 +527,7 @@ function statusesUpdate() {
 	if (status && status.length > 0) {
 		if (status.length > 0 && status.length <= 140) {
 			$.post(getContext() + '/execute.do?api=statusesUpdate', {
-				'status' : encode(status)
+				'status' : status
 			}, function(data) {
 				if (data && 'true' == data['status']) {
 					tipSuccess("成功发布微博");
