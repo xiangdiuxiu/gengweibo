@@ -120,4 +120,10 @@ public interface IWeibo {
 	 * 判断当前用户是否验证成功并返回该用户信息
 	 */
 	Response verifyCredentials();
+	
+	/**
+	 * 获取@评论当前登录用户的微博列表
+	 * @param param 获取参数的接口，具体实现类根据实际需要从中获取
+	 */
+	Response statusesMentions(IParam param);
 }

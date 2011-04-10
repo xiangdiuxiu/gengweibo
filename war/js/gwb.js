@@ -141,17 +141,17 @@ function sortLocalWeiboList(list) {
 	return list;
 }
 
-var timerHomeTimeline = null;
+var timerStatus = null;
 
-function loadHomeTimeline(url, argMap) {
+function loadStatus(url, argMap) {
 	$("#moreBtn").attr('value','正在加载数据...').attr('disabled',true);
 	if (!argMap) {
 		argMap = {};
 	}
 	//WEIBO_MAP = {};
 	$.post(url, argMap, function(data) {
-		if (timerHomeTimeline) {
-			clearInterval(timerHomeTimeline);
+		if (timerStatus) {
+			clearInterval(timerStatus);
 		}
 		if (data) {
 			var weiboList = data;
@@ -353,7 +353,7 @@ function loadHomeTimeline(url, argMap) {
 					}
 				} else if (weiboId.substring(0, 6) == "T_SOHU") {
 					// sohu ?
-					if (0 == list.length) {
+					if (!list.length || 0 == list.length) {
 						WEIBO_MAP[weiboId]['max_id'] = null;
 					} else {
 						WEIBO_MAP[weiboId]['max_id'] = list[list.length-1]['id'];
@@ -397,9 +397,10 @@ function loadHomeTimeline(url, argMap) {
 				htmlArray.push("</div></div></div></div>");
 			}
 			
+//			alert(htmlArray.join(""));
 			$("#items").append(htmlArray.join(""));
 			
-			timerHomeTimeline = setInterval(function() {
+			timerStatus = setInterval(function() {
 				$(".timestamp").each(function() {
 					var timestamp = $(this).attr("timestamp");
 					$(this).html(formatFromTimestamp(timestamp));
@@ -470,11 +471,7 @@ function loadHomeTimeline(url, argMap) {
 	}, "json");
 }
 
-function initLoadHomeTimeline() {
-	loadHomeTimeline(getContext() + '/execute.do?api=homeTimeline');
-}
-
-function moreHomeTimeline() {
+function moreStatuses(url) {
 	var postArg = {};
 	for (var weiboId in WEIBO_MAP) {
 		var weibo = WEIBO_MAP[weiboId];
@@ -493,11 +490,15 @@ function moreHomeTimeline() {
 		count++;
 	}
 	if (count > 0) {
-		loadHomeTimeline(getContext() + '/execute.do?api=moreHomeTimeline', postArg);
+		loadStatus(getContext() + url, postArg);
 	} else {
 		$("#moreItem").hide();
 		tipSuccess('没有更多的信息了!');
 	}
+}
+
+function moreHomeTimeline() {
+	moreStatuses('/execute.do?api=moreHomeTimeline');
 }
 
 function tip(msg) {
@@ -799,12 +800,27 @@ function finishViewStatusImg(tar) {
 
 function initMainPage() {
 	WEIBO_MAP = {};
-	initLoadHomeTimeline();
+	loadStatus(getContext() + '/execute.do?api=homeTimeline');
 	flushPage();
 }
 
 function statusesFlush() {
 	$("#items").html("");
 	initMainPage();
+}
+
+function mentionsFlush() {
+	$("#items").html("");
+	initStatusesMentionsPage();
+}
+
+function initStatusesMentionsPage() {
+	WEIBO_MAP = {};
+	loadStatus(getContext() + '/execute.do?api=statusesMentions');
+	flushPage();
+}
+
+function moreStatusesMentions() {
+	moreStatuses('/execute.do?api=moreStatusesMentions');
 }
 

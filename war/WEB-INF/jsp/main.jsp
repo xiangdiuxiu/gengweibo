@@ -1,10 +1,11 @@
 <%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/core" prefix = "c"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>更微博 - 更简约的微博查看工具</title>
+<title>我的首页</title>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css<jsp:include page="css_version.jsp" />" type="text/css" />
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/jquery-impromptu.3.1.css" type="text/css" />
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/block.css" type="text/css" />
@@ -13,12 +14,9 @@
 
 <div class="page">
 <div class='header'>
-	<a class='f-left headerA headerAOn' href='javascript:void(0);' style='margin-left: 5px;'>我的主页</a>
-	<%--
-	<a class='f-left headerA' href='javascript:void(0);' onclick='tobeImpl();'>@我的</a>
-	<a class='f-left headerA' href='javascript:void(0);' onclick='tobeImpl();'>我的收藏</a>
-	 --%>
-	<a class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=setting'>我的帐户</a>
+	<a id='navMain' class='f-left headerA headerAOn' href='javascript:void(0);' style='margin-left: 5px;'>我的主页</a>
+	<a id='navAtMe' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=atMe'>@我的</a>
+	<a id='navSetting' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=setting'>我的帐户</a>
 	<a class='f-right headerA' href='<%=request.getContextPath()%>/execute.do?api=logout' style='margin-right: 0px;'>退出</a>
 </div> 
 

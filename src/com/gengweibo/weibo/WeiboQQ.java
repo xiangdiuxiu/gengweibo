@@ -170,4 +170,18 @@ public class WeiboQQ extends Weibo implements IWeibo {
 			}
 		}
 	}
+	
+	public Response statusesMentions(IParam param) {
+		RequestParam reqParam = toRequestParam("reqnum", parseLegalPageCount(param.getParamValue("count"))).add("format", "json");
+		
+		if (null != param.getParamValue("pagetime")) {
+			reqParam.add("pagetime", param.getParamValue("pagetime"));
+		} 
+		
+		if (null != param.getParamValue("pageflag")) {
+			reqParam.add("pageflag", param.getParamValue("pageflag"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "statuses/mentions_timeline", GET);
+	}
 }

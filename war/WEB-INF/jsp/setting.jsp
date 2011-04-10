@@ -10,18 +10,15 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css<jsp:include page="css_version.jsp" />" type="text/css" />
-<title>更微博 - 更简约的微博查看工具</title>
+<title>我的帐户</title>
 </head>
 <body>
 
 <div class="page">
 <div class='header'>
-	<a class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=main'>我的主页</a>
-	<%--
-	<a class='f-left headerA' href='javascript:void(0);' onclick='tobeImpl();'>@我的</a>
-	<a class='f-left headerA' href='javascript:void(0);' onclick='tobeImpl();'>我的收藏</a>
-	 --%>
-	<a class='f-left headerA headerAOn' href='javascript:void(0);'>我的帐户</a>
+	<a id='navMain' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=main' style='margin-left: 5px;'>我的主页</a>
+	<a id='navAtMe' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=atMe'>@我的</a>
+	<a id='navSetting' class='f-left headerA headerAOn' href='javascript:void(0);'>我的帐户</a>
 	<a class='f-right headerA' href='<%=request.getContextPath()%>/execute.do?api=logout' style='margin-right: 0px;'>退出</a>
 </div>
 
