@@ -141,6 +141,14 @@ function sortLocalWeiboList(list) {
 	return list;
 }
 
+function handleRT(rt) {
+	if (rt) {
+		// TODO
+		return rt.replace("'", "");
+	}
+	return rt;
+}
+
 var timerStatus = null;
 
 function loadStatus(url, argMap) {
@@ -196,8 +204,10 @@ function loadStatus(url, argMap) {
 						statusImg = statusObj['img'];
 						statusRef = theWeibo['root_in_reply_to_status_text'] || "";
 						statusRefUserName = theWeibo['root_in_reply_to_user_name'] || "";
+						rt = "";
 						if (statusRef && "" != statusRef) {
 							statusRef = convertStatus163(statusRef)['status'];
+							rt = " ||@" + userName + ": " + theWeibo['text'];
 						}
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
@@ -210,7 +220,6 @@ function loadStatus(url, argMap) {
 						from = "<img src='" + getContext() + "/css/from163.png' title='内容来自网易微博[" + weiboAccountName + "]' />";
 						retweetCount = theWeibo['retweet_count'];
 						commentsCount = theWeibo['comments_count'];
-						rt = "";
 					
 					} else if (weiboId.substring(0, 6) == "T_SINA") {
 						statusId = theWeibo['id'];
@@ -231,7 +240,7 @@ function loadStatus(url, argMap) {
 						if (theWeibo['retweeted_status']) {
 							statusRef = convertStatusSina(theWeibo['retweeted_status']['text'])['status'];
 							statusRefUserName = theWeibo['retweeted_status']['user']['name'];
-							rt = "//@" + userName + ": " + theWeibo['text'];
+							rt = " //@" + userName + ": " + theWeibo['text'];
 						}
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
@@ -284,7 +293,7 @@ function loadStatus(url, argMap) {
 						rt = "";
 						if (statusRef && "" != statusRef) {
 							statusRef = convertStatusSohu(statusRef)['status'];
-							rt = "//@" + userName + ": " + theWeibo['text'];
+							rt = " //@" + userName + ": " + theWeibo['text'];
 						}
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
@@ -319,7 +328,7 @@ function loadStatus(url, argMap) {
 						'from' : from,
 						'retweetCount' : retweetCount,
 						'commentsCount' : commentsCount,
-						'rt' : rt
+						'rt' : handleRT(rt)
 					});
 					
 				}
@@ -570,29 +579,76 @@ function statusesRetweet(tar) {
 		'weiboId' : ws.weiboId,
 		'statusId' : ws.statusId
 	};
-	if (ws.rt && "" != ws.rt) {
-		if (ws.weiboId.substring(0, 6) == "T_SINA") {
-			if (ws.rt.length > 140) {
-				tipError("转发微博失败"); // TODO 
-				return;
-			} else {
-				postArg['status'] = ws.rt;
-			}
-		} else if (ws.weiboId.substring(0, 6) == "T_SOHU") {
-			postArg['status'] = "转发微博。 " + ws.rt;
-		}
-		
-		if (postArg['status']) {
-			postArg['status'] = encode(postArg['status']);
-		}
+	
+	var def = "说点啥呗";
+	if (ws.rt && ws.rt.length > 0) {
+		def = ws.rt;
 	}
-	$.post(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
-		if (data && 'true' == data['status']) {
-			tipSuccess("成功转发微博");
-		} else {
-			tipError("转发微博失败[" + data['desc'] + "]");
-		}
-	}, 'json');
+	var html = "<textarea id='rtTa' onclick='inputTxtClick(this);' onblur='inputTxtBlur(this);' gValue='说点啥呗' class='rArea' name='userRetweetContent'>" + def + "</textarea>";
+	$.prompt(html,{
+		callback: function(v, m, f){
+			if(v != undefined && 'submit' == v) {
+				var retweet = $.trim(f.userRetweetContent);
+				if ("说点啥呗" == retweet) {
+					retweet = null;
+				}
+				
+				if (retweet && retweet.length > 0) {
+					if (ws.weiboId.substring(0, 4) == "T_QQ" || ws.weiboId.substring(0, 6) == "T_SINA") {
+						if (retweet.length > 140) {
+							tip("转发微博失败，内容超过140个字。");
+							return;
+						}
+					} else if (ws.weiboId.substring(0, 5) == "T_163") {
+						if (retweet.length > 140) {
+							tip("转发微博失败，内容超过163个字。"); 
+							return;
+						}
+					}
+					
+					if (ws.weiboId.substring(0, 5) != "T_163") {
+						postArg['status'] = encode(retweet);
+					} else {
+						postArg['status'] = retweet;
+					}
+				}
+				
+				$.post(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
+					if (data && 'true' == data['status']) {
+						tipSuccess("成功转发微博");
+					} else {
+						tipError("转发微博失败[" + data['desc'] + "]");
+					}
+				}, 'json');
+			}
+		},
+		buttons: { 转发: 'submit', 取消:'cancel' }
+	});
+	
+	
+//	if (ws.rt && "" != ws.rt) {
+//		if (ws.weiboId.substring(0, 6) == "T_SINA") {
+//			if (ws.rt.length > 140) {
+//				tipError("转发微博失败"); 
+//				return;
+//			} else {
+//				postArg['status'] = ws.rt;
+//			}
+//		} else if (ws.weiboId.substring(0, 6) == "T_SOHU") {
+//			postArg['status'] = "转发微博。 " + ws.rt;
+//		}
+//		
+//		if (postArg['status']) {
+//			postArg['status'] = encode(postArg['status']);
+//		}
+//	}
+//	$.post(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
+//		if (data && 'true' == data['status']) {
+//			tipSuccess("成功转发微博");
+//		} else {
+//			tipError("转发微博失败[" + data['desc'] + "]");
+//		}
+//	}, 'json');
 }
 
 function inputTxtClick(tar) {
