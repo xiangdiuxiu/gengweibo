@@ -1,5 +1,16 @@
 var WEIBO_MAP = {};
 
+function wPost(url, data, callback, type) {
+	$.ajax({
+		type: "POST",
+		contentType: "application/x-www-form-urlencoded; charset=utf-8",
+		url: url,
+		data: data,
+		success: callback,
+		dataType: type
+	});
+}
+
 var CONTEXT = null;
 function getContext() {
 	if (!CONTEXT) {
@@ -18,9 +29,9 @@ function getContext() {
 }
 
 function encode(value) {
-	if (value) {
-		return encodeURI(value);
-	}
+//	if (value) {
+//		return encodeURI(value);
+//	}
 	return value;
 }
 
@@ -269,17 +280,18 @@ function loadStatus(url, argMap) {
 						if (theWeibo['image'] && theWeibo['image'].length > 0) {
 							statusImg = theWeibo['image'][0];
 						}
+						rt = "";
 						statusRef = "";
 						statusRefUserName = "";
 						if (theWeibo['source']) {
 							statusRef = theWeibo['source']['text'];
 							statusRefUserName = theWeibo['source']['nick'];
+							rt = " //@" + theWeibo['name'] + ": " + theWeibo['text'];
 						}
 						timestamp = Number(theWeibo['timestamp']) * 1000;
 						from = "<img src='" + getContext() + "/css/fromqq.png' title='内容来自腾讯微博[" + weiboAccountName + "]' />";
 						retweetCount = "";
 						commentsCount = theWeibo['count'];
-						rt = "";
 						
 					} else if (weiboId.substring(0, 6) == "T_SOHU") {
 						statusId = theWeibo['id'];
@@ -526,8 +538,8 @@ function statusesUpdate() {
 	var status = $.trim($("#statusTextarea").val());
 	if (status && status.length > 0) {
 		if (status.length > 0 && status.length <= 140) {
-			$.post(getContext() + '/execute.do?api=statusesUpdate', {
-				'status' : status
+			wPost(getContext() + '/execute.do?api=statusesUpdate', {
+				'status' : encode(status)
 			}, function(data) {
 				if (data && 'true' == data['status']) {
 					tipSuccess("成功发布微博");
@@ -606,14 +618,15 @@ function statusesRetweet(tar) {
 						}
 					}
 					
-					if (ws.weiboId.substring(0, 5) != "T_163") {
-						postArg['status'] = encode(retweet);
-					} else {
-						postArg['status'] = retweet;
-					}
+					postArg['status'] = encode(retweet);
+//					if (ws.weiboId.substring(0, 5) != "T_163") {
+//						postArg['status'] = encode(retweet);
+//					} else {
+//						postArg['status'] = retweet;
+//					}
 				}
 				
-				$.post(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
+				wPost(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
 					if (data && 'true' == data['status']) {
 						tipSuccess("成功转发微博");
 					} else {
@@ -625,30 +638,6 @@ function statusesRetweet(tar) {
 		buttons: { 转发: 'submit', 取消:'cancel' }
 	});
 	
-	
-//	if (ws.rt && "" != ws.rt) {
-//		if (ws.weiboId.substring(0, 6) == "T_SINA") {
-//			if (ws.rt.length > 140) {
-//				tipError("转发微博失败"); 
-//				return;
-//			} else {
-//				postArg['status'] = ws.rt;
-//			}
-//		} else if (ws.weiboId.substring(0, 6) == "T_SOHU") {
-//			postArg['status'] = "转发微博。 " + ws.rt;
-//		}
-//		
-//		if (postArg['status']) {
-//			postArg['status'] = encode(postArg['status']);
-//		}
-//	}
-//	$.post(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
-//		if (data && 'true' == data['status']) {
-//			tipSuccess("成功转发微博");
-//		} else {
-//			tipError("转发微博失败[" + data['desc'] + "]");
-//		}
-//	}, 'json');
 }
 
 function inputTxtClick(tar) {
@@ -810,7 +799,7 @@ function statusesReply(tar) {
 			if(v != undefined && 'submit' == v) {
 				var reply = $.trim(f.userReplyContent);
 				if (reply && '' != reply && '点击输入评论' != reply) {
-					$.post(getContext() + '/execute.do?api=statusesReply', {
+					wPost(getContext() + '/execute.do?api=statusesReply', {
 						'weiboId' : ws.weiboId,
 						'statusId' : ws.statusId,
 						'status' : encode(reply)

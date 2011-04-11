@@ -21,6 +21,7 @@ import com.gengweibo.util.Utils;
 import com.gengweibo.web.param.MoreHomeTimelineParam;
 import com.gengweibo.web.param.StatusesCountParam;
 import com.gengweibo.web.param.WebParam;
+import com.gengweibo.weibo.IParam;
 import com.gengweibo.weibo.IWeibo;
 import com.gengweibo.weibo.Response;
 import com.gengweibo.weibo.WeiboManager;
@@ -187,10 +188,13 @@ public class AccountAcction extends ActionSupport {
 		Collection<IWeibo> weiboList = account.getWeiboMap().values();
 		if (null != weiboList) {
 			Response response = null;
+			IParam iParam = new WebParam(getContext());
+			System.out.println("iParam:" + iParam.getParamValue("status"));
+			System.out.println("Content-Type:" + getRequest().getHeader("Content-Type"));
 			for (IWeibo w : weiboList) {
 				response = null;
 				try {
-					response = w.statusesUpdate(new WebParam(getContext()));
+					response = w.statusesUpdate(iParam);
 				} catch (Exception e) {
 					if (LOG.isDebugEnabled()) {
 						if (null != response) {
