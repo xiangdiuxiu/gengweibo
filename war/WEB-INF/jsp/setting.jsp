@@ -10,6 +10,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css<jsp:include page="css_version.jsp" />" type="text/css" />
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/block.css" type="text/css" />
 <title>我的帐户</title>
 </head>
 <body>
@@ -53,6 +54,7 @@
 		for (IWeibo weibo : weiboList) {
 			content.append("<div style='font-size:14px;font-weight:bold;'>").append(weibo.getType().getCnName()).append("&nbsp;")
 			.append("@" + weibo.getWeiboAccountName()).append("&nbsp;")
+			.append("<label><input").append(weibo.isSynUpdate() ? " checked='checked' " : "").append(" weiboId='").append(weibo.getWeiboId()).append("' type='checkbox' onclick='changeSyn(this);'/>同步发微博</label>&nbsp;")
 			.append("<a href='" + request.getContextPath() + "/execute.do?api=unlink&weiboId=").append(weibo.getWeiboId()).append("'>").append("解除连接").append("</a>")
 			.append("</div>");
 		}
@@ -65,5 +67,6 @@
 
 </body>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script> 
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/gwb.js<jsp:include page="js_version.jsp" />"></script> 
 </html>

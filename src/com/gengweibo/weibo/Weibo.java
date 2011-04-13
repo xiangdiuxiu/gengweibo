@@ -73,6 +73,8 @@ public abstract class Weibo implements IWeibo, Serializable {
 	 */
 	protected String weiboId;
 	
+	protected boolean synUpdate;
+	
 	protected int parseLegalPageCount(String value) {
 		if (null != value) {
 			try {
@@ -287,8 +289,7 @@ public abstract class Weibo implements IWeibo, Serializable {
 				}
 			}
 			
-			// TODO
-			throw new RuntimeException();
+			throw new RuntimeException("UnexpectedException");
 			
 		} catch (Exception e) {
 			throw new WeiException(e);
@@ -336,5 +337,13 @@ public abstract class Weibo implements IWeibo, Serializable {
 		}
 		
 		return sendRequest(reqParam, urlResource + "statuses/mentions.json", GET);
+	}
+
+	public boolean isSynUpdate() {
+		return synUpdate;
+	}
+
+	public void setSynUpdate(boolean synUpdate) {
+		this.synUpdate = synUpdate;
 	}
 }

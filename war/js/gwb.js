@@ -199,6 +199,7 @@ function loadStatus(url, argMap) {
 					var status = null;
 					var statusImg = null;
 					var statusRef = null;
+					var statusRefImg = null;
 					var statusRefUserName = null;
 					var timestamp = null;
 					var from = null;
@@ -212,18 +213,20 @@ function loadStatus(url, argMap) {
 						userName = theWeibo['user']['name'];
 						var statusObj = convertStatus163(theWeibo['text']);
 						status = statusObj['status'];
-						statusImg = statusObj['img'];
+						statusImg = (statusObj['img'] || "");
 						statusRef = theWeibo['root_in_reply_to_status_text'] || "";
 						statusRefUserName = theWeibo['root_in_reply_to_user_name'] || "";
 						rt = "";
+						statusRefImg = "";
 						if (statusRef && "" != statusRef) {
-							statusRef = convertStatus163(statusRef)['status'];
+							var sr = convertStatus163(statusRef);
+							statusRef = sr['status'];
 							rt = " ||@" + userName + ": " + theWeibo['text'];
+							statusRefImg = (sr['img'] || "");
 						}
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
 						if (6 != createAtArray.length) {
-							// TODO
 							continue;
 						}
 						createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
@@ -248,15 +251,16 @@ function loadStatus(url, argMap) {
 						statusRef = "";
 						statusRefUserName = "";
 						rt = "";
+						statusRefImg = "";
 						if (theWeibo['retweeted_status']) {
 							statusRef = convertStatusSina(theWeibo['retweeted_status']['text'])['status'];
 							statusRefUserName = theWeibo['retweeted_status']['user']['name'];
 							rt = " //@" + userName + ": " + theWeibo['text'];
+							statusRefImg = (theWeibo['retweeted_status']['thumbnail_pic'] || "");
 						}
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
 						if (6 != createAtArray.length) {
-							// TODO
 							continue;
 						}
 						createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
@@ -281,12 +285,16 @@ function loadStatus(url, argMap) {
 							statusImg = theWeibo['image'][0];
 						}
 						rt = "";
+						statusRefImg = "";
 						statusRef = "";
 						statusRefUserName = "";
 						if (theWeibo['source']) {
 							statusRef = theWeibo['source']['text'];
 							statusRefUserName = theWeibo['source']['nick'];
 							rt = " //@" + theWeibo['name'] + ": " + theWeibo['text'];
+							if (theWeibo['source']['image'] && theWeibo['source']['image'].length > 0) {
+								statusRefImg = theWeibo['source']['image'][0];
+							}
 						}
 						timestamp = Number(theWeibo['timestamp']) * 1000;
 						from = "<img src='" + getContext() + "/css/fromqq.png' title='内容来自腾讯微博[" + weiboAccountName + "]' />";
@@ -303,6 +311,7 @@ function loadStatus(url, argMap) {
 						statusRef = theWeibo['in_reply_to_status_text'] || "";
 						statusRefUserName = theWeibo['in_reply_to_screen_name'] || "";
 						rt = "";
+						statusRefImg = ""; // TODO in_reply_to_has_image=true？
 						if (statusRef && "" != statusRef) {
 							statusRef = convertStatusSohu(statusRef)['status'];
 							rt = " //@" + userName + ": " + theWeibo['text'];
@@ -310,7 +319,6 @@ function loadStatus(url, argMap) {
 						var createAt = theWeibo['created_at'];
 						var createAtArray = createAt.split(" ");
 						if (6 != createAtArray.length) {
-							// TODO
 							continue;
 						}
 						createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
@@ -335,6 +343,7 @@ function loadStatus(url, argMap) {
 						'status' : status,
 						'statusImg' : statusImg,
 						'statusRef' : statusRef,
+						'statusRefImg' : statusRefImg,
 						'statusRefUserName' : statusRefUserName,
 						'timestamp' : timestamp,
 						'from' : from,
@@ -380,6 +389,8 @@ function loadStatus(url, argMap) {
 						WEIBO_MAP[weiboId]['max_id'] = list[list.length-1]['id'];
 					}
 				}
+				
+				WEIBO_MAP[weiboId]['weiboAccountName'] = weiboAccountName;
 			}
 			
 			localWeiboList = sortLocalWeiboList(localWeiboList);
@@ -399,7 +410,11 @@ function loadStatus(url, argMap) {
 				htmlArray.push("</div><div class='status-1'>", local.status, "</div>");
 				if ("" != local.statusRef && "" != local.statusRefUserName) {
 					var refUserNameSpan = "<span title='" + local.statusRefUserName + "' class='userName'>" + local.statusRefUserName + ":</span>";
-					htmlArray.push("<div class='status-2'>", refUserNameSpan, local.statusRef, "</div>");
+					var statusRefImg = "";
+					if (local.statusRefImg && "" != local.statusRefImg) {
+						statusRefImg = "<span imgSrc='" + local.statusRefImg + "' title='图片' class='refImg' onmouseover='viewStatusImg(this);' onmouseout='finishViewStatusImg(this);'><img src='" + getContext() + "/css/itisimg.PNG' /></span>";
+					}
+					htmlArray.push("<div class='status-2'>", refUserNameSpan, local.statusRef, statusRefImg, "</div>");
 				}
 				htmlArray.push("</div>");
 				
@@ -869,3 +884,16 @@ function moreStatusesMentions() {
 	moreStatuses('/execute.do?api=moreStatusesMentions');
 }
 
+function changeSyn(tar) {
+	var tarObj = $(tar);
+	$.post(getContext() + '/execute.do?api=synUpdate', {
+		'weiboId' : tarObj.attr("weiboId"),
+		'syn' : tarObj.attr("checked")
+	}, function(data) {
+		if (data && 'true' == data['status']) {
+			tipSuccess("成功设置");
+		} else {
+			tipError("设置失败[" + data['desc'] + "]");
+		}
+	}, 'json');
+}

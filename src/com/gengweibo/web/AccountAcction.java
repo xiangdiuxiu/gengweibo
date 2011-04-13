@@ -189,9 +189,12 @@ public class AccountAcction extends ActionSupport {
 		if (null != weiboList) {
 			Response response = null;
 			IParam iParam = new WebParam(getContext());
-			System.out.println("iParam:" + iParam.getParamValue("status"));
-			System.out.println("Content-Type:" + getRequest().getHeader("Content-Type"));
+//			System.out.println("iParam:" + iParam.getParamValue("status"));
+//			System.out.println("Content-Type:" + getRequest().getHeader("Content-Type"));
 			for (IWeibo w : weiboList) {
+				if (!w.isSynUpdate()) {
+					continue;
+				}
 				response = null;
 				try {
 					response = w.statusesUpdate(iParam);
@@ -424,6 +427,22 @@ public class AccountAcction extends ActionSupport {
 	public Result logout() {
 		getSession().removeAttribute(Account.ACCOUNT_SESSION_KEY);
 		return new Result(getRequest().getContextPath() + "/index.jsp", true);
+	}
+	
+	@Api("synUpdate")
+	public Result synUpdate() {
+		Account account = getCurrentAccount();
+		if (account.getWeiboMap().size() > 0) {
+			String weiboId = getRequestString("weiboId");
+			if (null != weiboId) {
+				boolean synUpdate = getRequestBoolean("syn");
+				account.getWeiboMap().get(weiboId).setSynUpdate(synUpdate);
+				
+				// TODO 目前是即时更新db，或者改到队列什么的去做？
+				weiboDao.updateSyn(weiboId, synUpdate);
+			}
+		}
+		return new Result("/WEB-INF/jsp/result.jsp").addValue("result", "{\"status\":\"true\",\"desc\":\"success\"}");
 	}
 
 }

@@ -64,4 +64,11 @@ public class WeiboDaoMemoryImpl implements WeiboDao {
 		return null;
 	}
 
+	public void updateSyn(String weiboId, boolean synUpdate) {
+		IWeibo weibo = weiboMap.get(weiboId);
+		if (null != weibo) {
+			weibo.setSynUpdate(synUpdate);
+		}
+	}
+
 }

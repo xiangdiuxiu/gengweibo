@@ -66,6 +66,11 @@ public interface IWeibo {
 	Response homeTimeline(IParam param);
 	
 	/**
+	 * 是否同步发送微博
+	 */
+	boolean isSynUpdate();
+	
+	/**
 	 * 生成用于oauth登录的url地址
 	 */
 	String makeClickUrl();
@@ -74,6 +79,11 @@ public interface IWeibo {
 	 * 设置此微博所关联的账户ID(如果该账户是第一次使用，用UUID来生成)
 	 */
 	void setAccountId(String accountId);
+	
+	/**
+	 * 设置是否同步发送微博
+	 */
+	void setSynUpdate(boolean synUpdate);
 	
 	/**
 	 * 设置此微博所关联的账户昵称
@@ -99,6 +109,12 @@ public interface IWeibo {
 	Response statusesDestroy(IParam param);
 	
 	/**
+	 * 获取@评论当前登录用户的微博列表
+	 * @param param 获取参数的接口，具体实现类根据实际需要从中获取
+	 */
+	Response statusesMentions(IParam param);
+	
+	/**
 	 * 评论一条微博
 	 * @param param 获取参数的接口，具体实现类根据实际需要从中获取
 	 */
@@ -115,15 +131,9 @@ public interface IWeibo {
 	 * @param param 获取参数的接口，具体实现类根据实际需要从中获取
 	 */
 	Response statusesUpdate(IParam param);
-	
+
 	/**
 	 * 判断当前用户是否验证成功并返回该用户信息
 	 */
 	Response verifyCredentials();
-	
-	/**
-	 * 获取@评论当前登录用户的微博列表
-	 * @param param 获取参数的接口，具体实现类根据实际需要从中获取
-	 */
-	Response statusesMentions(IParam param);
 }

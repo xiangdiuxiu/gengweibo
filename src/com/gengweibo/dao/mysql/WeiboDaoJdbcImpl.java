@@ -73,7 +73,9 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
 	
 	public void save(IWeibo weibo) {
 		Connection conn = null;
-		PreparedStatement pstmtDel = null;
+		PreparedStatement pstmtQuery = null;
+		ResultSet rs = null;
+		PreparedStatement pstmtUpdate = null;
 		PreparedStatement pstmtSave = null;
 		
 		try {
@@ -82,20 +84,36 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
 			
 			Weibo wei = (Weibo) weibo;
 			
-			// 先尝试删除
-			pstmtDel = conn.prepareStatement("delete from gwb_weibo where weibo_id=?");
-			pstmtDel.setString(1, wei.getWeiboId());
-			pstmtDel.executeUpdate();
+			// 先查找，如果已存在就更新，否则直接新插入
+			pstmtQuery = conn.prepareStatement("select * from gwb_weibo where weibo_id=?");
+			pstmtQuery.setString(1, wei.getWeiboId());
+			rs = pstmtQuery.executeQuery();
 			
-			// 保存
-			pstmtSave = conn.prepareStatement("insert into gwb_weibo(account_id,access_token,token_secret,type,weibo_id) values(?,?,?,?,?)");
-			pstmtSave.setString(1, wei.getAccountId());
-			pstmtSave.setString(2, wei.getAccessor().accessToken);
-			pstmtSave.setString(3, wei.getAccessor().tokenSecret);
-			pstmtSave.setString(4, wei.getType().getEnName());
-			pstmtSave.setString(5, wei.getWeiboId());
-			
-			pstmtSave.executeUpdate();
+			if (rs.next()) {
+				// 更新
+				pstmtUpdate = conn.prepareStatement("update gwb_weibo set access_token=?,token_secret=? where weibo_id=?");
+				pstmtUpdate.setString(1, wei.getAccessor().accessToken);
+				pstmtUpdate.setString(2, wei.getAccessor().tokenSecret);
+				pstmtUpdate.setString(3, wei.getWeiboId());
+				pstmtUpdate.executeUpdate();
+				
+				weibo.setSynUpdate(Boolean.valueOf(rs.getString("syn_update")));
+				
+			} else {
+				// 新保存
+				pstmtSave = conn.prepareStatement("insert into gwb_weibo(account_id,access_token,token_secret,type,weibo_id,syn_update) values(?,?,?,?,?,?)");
+				pstmtSave.setString(1, wei.getAccountId());
+				pstmtSave.setString(2, wei.getAccessor().accessToken);
+				pstmtSave.setString(3, wei.getAccessor().tokenSecret);
+				pstmtSave.setString(4, wei.getType().getEnName());
+				pstmtSave.setString(5, wei.getWeiboId());
+				
+				// 
+				wei.setSynUpdate(true);
+				pstmtSave.setString(6, String.valueOf(wei.isSynUpdate()));
+				
+				pstmtSave.executeUpdate();
+			}
 			
 			conn.commit();
 			
@@ -112,7 +130,9 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
 			throw new RuntimeException(e);
 		} finally {
 			closeQuietly(conn);
-			closeQuietly(pstmtDel);
+			closeQuietly(pstmtQuery);
+			closeQuietly(rs);
+			closeQuietly(pstmtUpdate);
 			closeQuietly(pstmtSave);
 		}
 	}
@@ -179,12 +199,14 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
 					String type = rsQueryWeibo.getString("type");
 					String accessToken = rsQueryWeibo.getString("access_token");
 					String tokenSecret = rsQueryWeibo.getString("token_secret");
+					boolean synUpdate = Boolean.valueOf(rsQueryWeibo.getString("syn_update"));
 					
 					Weibo weibo = (Weibo) WeiboManager.newWeibo(WeiboType.of(type));
 					weibo.setAccountId(accountId);
 					weibo.getAccessor().requestToken = null;
 					weibo.getAccessor().accessToken = accessToken;
 					weibo.getAccessor().tokenSecret = tokenSecret;
+					weibo.setSynUpdate(synUpdate);
 					weibo.bindWeiboAccountContext();
 					
 					list.add(weibo);
@@ -201,6 +223,40 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
 			closeQuietly(rsQueryAccountId);
 			closeQuietly(pstmtQueryWeibo);
 			closeQuietly(rsQueryWeibo);
+		}
+	}
+
+	public void updateSyn(String weiboId, boolean synUpdate) {
+		Connection conn = null;
+		PreparedStatement pstmtUpdate = null;
+		
+		try {
+			conn = dataSource.getConnection();
+			conn.setAutoCommit(false);
+			
+			// 更新
+			pstmtUpdate = conn.prepareStatement("update gwb_weibo set syn_update=? where weibo_id=?");
+			pstmtUpdate.setString(1, String.valueOf(synUpdate));
+			pstmtUpdate.setString(2, weiboId);
+			pstmtUpdate.executeUpdate();
+			
+			conn.commit();
+			
+		} catch (SQLException e) {
+			if (null != conn) {
+				try {
+					conn.rollback();
+				} catch (SQLException re) {
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("method:updateSyn", re);
+					}
+				}
+			}
+			
+			throw new RuntimeException(e);
+		} finally {
+			closeQuietly(conn);
+			closeQuietly(pstmtUpdate);
 		}
 	}
 

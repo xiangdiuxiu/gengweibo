@@ -19,6 +19,11 @@ public interface WeiboDao {
 	void save(IWeibo weibo);
 	
 	/**
+	 * 更新微博帐户的同步状态，也就是是否同步推送微博
+	 */
+	void updateSyn(String weiboId, boolean synUpdate);
+	
+	/**
 	 * 删除已连接的微博帐户
 	 */
 	void delete(String weiboId);

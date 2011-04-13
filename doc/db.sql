@@ -10,6 +10,9 @@ create table gwb_weibo(
  token_secret varchar(255),
  type varchar(255),
  weibo_id varchar(255),
+ syn_update varchar(10),/*true, false*/
  primary key(id),
  key(account_id)
 )Engine Innodb Default Charset=utf8;
+
+alter table gwb_weibo add column syn_update varchar(10);
