@@ -1,7 +1,7 @@
 var WEIBO_MAP = {};
 var timerStatus = null;
 var STATUS_CACHE = null;
-var EACH_WEIBO_STATUS_COUNT = 10;
+var EACH_WEIBO_STATUS_COUNT = 20;
 
 function wPost(url, data, callback, type) {
 	$.ajax({
@@ -400,7 +400,7 @@ function loadStatus(url, argMap) {
 			}
 			
 			STATUS_CACHE = sortLocalWeiboList(STATUS_CACHE);
-			var maxLen = totalWeiboId * EACH_WEIBO_STATUS_COUNT;
+			var maxLen = EACH_WEIBO_STATUS_COUNT;
 			if (maxLen > STATUS_CACHE.length) {
 				maxLen = STATUS_CACHE.length;
 			} 
@@ -446,13 +446,17 @@ function loadStatus(url, argMap) {
 				htmlArray.push("</div></div></div></div>");
 			}
 			
-			for (var i = 0; i < maxLen; i++) {
-				STATUS_CACHE.splice(0, 1);
+			var start = maxLen;
+			var end = start + EACH_WEIBO_STATUS_COUNT;
+			if (end > STATUS_CACHE.length) {
+				end = STATUS_CACHE.length;
+			}
+			if (end > start) {
+				STATUS_CACHE = STATUS_CACHE.slice(start, end);
 			}
 			
 			// 删除多余的，避免缓存太大了
-			var maxCacheLen = totalWeiboId * EACH_WEIBO_STATUS_COUNT;
-			if (STATUS_CACHE.length > maxCacheLen) {
+			if (STATUS_CACHE.length > EACH_WEIBO_STATUS_COUNT) {
 				for (var d = STATUS_CACHE.length-1; d >= maxCacheLen; d--) {
 					STATUS_CACHE.splice(d, 1);
 				}

@@ -90,11 +90,13 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
 			rs = pstmtQuery.executeQuery();
 			
 			if (rs.next()) {
+				
 				// 更新
-				pstmtUpdate = conn.prepareStatement("update gwb_weibo set access_token=?,token_secret=? where weibo_id=?");
+				pstmtUpdate = conn.prepareStatement("update gwb_weibo set access_token=?,token_secret=?,account_id=? where weibo_id=?");
 				pstmtUpdate.setString(1, wei.getAccessor().accessToken);
 				pstmtUpdate.setString(2, wei.getAccessor().tokenSecret);
-				pstmtUpdate.setString(3, wei.getWeiboId());
+				pstmtUpdate.setString(3, wei.getAccountId());
+				pstmtUpdate.setString(4, wei.getWeiboId());
 				pstmtUpdate.executeUpdate();
 				
 				weibo.setSynUpdate(Boolean.valueOf(rs.getString("syn_update")));
