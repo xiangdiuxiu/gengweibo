@@ -1,4 +1,7 @@
 var WEIBO_MAP = {};
+var timerStatus = null;
+var STATUS_CACHE = null;
+var EACH_WEIBO_STATUS_COUNT = 10;
 
 function wPost(url, data, callback, type) {
 	$.ajax({
@@ -160,14 +163,12 @@ function handleRT(rt) {
 	return rt;
 }
 
-var timerStatus = null;
-
 function loadStatus(url, argMap) {
 	$("#moreBtn").attr('value','正在加载数据...').attr('disabled',true);
 	if (!argMap) {
 		argMap = {};
 	}
-	//WEIBO_MAP = {};
+	
 	$.post(url, argMap, function(data) {
 		if (timerStatus) {
 			clearInterval(timerStatus);
@@ -175,10 +176,15 @@ function loadStatus(url, argMap) {
 		if (data) {
 			var weiboList = data;
 			var htmlArray = [];
-			var localWeiboList = [];
+			if (!STATUS_CACHE) {
+				STATUS_CACHE = [];
+			}
+//			var localWeiboList = [];
 			var sinaStatusCount = {};
 			var sohuStatusCount = {};
+			var totalWeiboId = 0;
 			for (var i in weiboList) {
+				totalWeiboId += 1;
 				var weibo = weiboList[i];
 				var weiboId = weibo['weiboId'];
 				var weiboAccountName = weibo['weiboAccountName'];
@@ -335,7 +341,7 @@ function loadStatus(url, argMap) {
 						continue;
 					}
 					
-					localWeiboList.push({
+					STATUS_CACHE.push({
 						'weiboId' : weiboId,
 						'statusId' : statusId,
 						'userHeader' : userHeader,
@@ -393,9 +399,16 @@ function loadStatus(url, argMap) {
 				WEIBO_MAP[weiboId]['weiboAccountName'] = weiboAccountName;
 			}
 			
-			localWeiboList = sortLocalWeiboList(localWeiboList);
-			for (var i in localWeiboList) {
-				var local = localWeiboList[i];
+			STATUS_CACHE = sortLocalWeiboList(STATUS_CACHE);
+			var maxLen = totalWeiboId * EACH_WEIBO_STATUS_COUNT;
+			if (maxLen > STATUS_CACHE.length) {
+				maxLen = STATUS_CACHE.length;
+			} 
+			
+			//alert("maxLen:" + maxLen + ",STATUS_CACHE.length:" + STATUS_CACHE.length);
+			
+			for (var i = 0; i < maxLen; i++) {
+				var local = STATUS_CACHE[i];
 				
 				var createTime = formatFromTimestamp(local.timestamp);
 				
@@ -433,7 +446,18 @@ function loadStatus(url, argMap) {
 				htmlArray.push("</div></div></div></div>");
 			}
 			
-//			alert(htmlArray.join(""));
+			for (var i = 0; i < maxLen; i++) {
+				STATUS_CACHE.splice(0, 1);
+			}
+			
+			// 删除多余的，避免缓存太大了
+			var maxCacheLen = totalWeiboId * EACH_WEIBO_STATUS_COUNT;
+			if (STATUS_CACHE.length > maxCacheLen) {
+				for (var d = STATUS_CACHE.length-1; d >= maxCacheLen; d--) {
+					STATUS_CACHE.splice(d, 1);
+				}
+			}
+			
 			$("#items").append(htmlArray.join(""));
 			
 			timerStatus = setInterval(function() {
@@ -520,6 +544,13 @@ function moreStatuses(url) {
 		} else {
 			// TODO
 		}
+		
+//		if (weiboId.substring(0, 6) == "T_SINA") {
+//			postArg[weiboId + '_count'] = 11;
+//		} else {
+//			postArg[weiboId + '_count'] = 10;
+//		}
+		
 	}
 	var count = 0;
 	for (var i in postArg) {
@@ -634,11 +665,6 @@ function statusesRetweet(tar) {
 					}
 					
 					postArg['status'] = encode(retweet);
-//					if (ws.weiboId.substring(0, 5) != "T_163") {
-//						postArg['status'] = encode(retweet);
-//					} else {
-//						postArg['status'] = retweet;
-//					}
 				}
 				
 				wPost(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
@@ -860,6 +886,7 @@ function finishViewStatusImg(tar) {
 
 function initMainPage() {
 	WEIBO_MAP = {};
+	STATUS_CACHE = null;
 	loadStatus(getContext() + '/execute.do?api=homeTimeline');
 	flushPage();
 }
@@ -876,6 +903,7 @@ function mentionsFlush() {
 
 function initStatusesMentionsPage() {
 	WEIBO_MAP = {};
+	STATUS_CACHE = null;
 	loadStatus(getContext() + '/execute.do?api=statusesMentions');
 	flushPage();
 }

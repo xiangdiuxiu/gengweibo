@@ -49,11 +49,19 @@ public class MoreHomeTimelineParam implements IParam {
 			}
 			break;
 		case T_SOHU:
+			if (key.endsWith("max_id")) {
+				return value;
+			}
 			break;
 		default:
 			break;
 		}
-		return null;
+		
+		if (key.endsWith("count")) {
+			return context.getRequestString(weibo.getWeiboId() + "_count");
+		}
+		
+		return context.getRequestString(key);
 	}
 
 }
