@@ -136,13 +136,13 @@ public class AccountAcction extends ActionSupport {
 		StringBuilder content = new StringBuilder();
 		Collection<IWeibo> weiboList = account.getWeiboMap().values();
 		if (null != weiboList) {
+			IParam param = new WebParam(getContext());
 			for (IWeibo w : weiboList) {
-				Response response = w.homeTimeline(new WebParam(getContext()));
+				Response response = w.homeTimeline(param);
 				String bodyString = null;
 				if (null != response) {
 					bodyString = response.readBodyAsString();
 				}
-//				System.out.println("bodyString---" + bodyString);
 				content.append("{\"weiboId\":\"").append(w.getWeiboId()).append("\",\"list\":")
 				.append(bodyString).append(",\"weiboAccountName\":\"").append(w.getWeiboAccountName())
 				.append("\"},");
@@ -163,12 +163,14 @@ public class AccountAcction extends ActionSupport {
 		if (null != weiboList) {
 			Context context = getContext();
 			for (IWeibo w : weiboList) {
+				if (Utils.isStringEmpty(context.getRequestString(w.getWeiboId()))) {
+					continue;
+				}
 				Response response = w.homeTimeline(new MoreHomeTimelineParam(w, context));
 				String bodyString = null;
 				if (null != response) {
 					bodyString = response.readBodyAsString();
 				}
-				//System.out.println(bodyString);
 				content.append("{\"weiboId\":\"").append(w.getWeiboId()).append("\",\"list\":")
 				.append(bodyString).append(",\"weiboAccountName\":\"").append(w.getWeiboAccountName())
 				.append("\"},");
@@ -184,13 +186,10 @@ public class AccountAcction extends ActionSupport {
 	@Api("statusesUpdate")
 	public Result statusesUpdate() {
 		Account account = getCurrentAccount();
-//		StringBuilder content = new StringBuilder();
 		Collection<IWeibo> weiboList = account.getWeiboMap().values();
 		if (null != weiboList) {
 			Response response = null;
 			IParam iParam = new WebParam(getContext());
-//			System.out.println("iParam:" + iParam.getParamValue("status"));
-//			System.out.println("Content-Type:" + getRequest().getHeader("Content-Type"));
 			for (IWeibo w : weiboList) {
 				if (!w.isSynUpdate()) {
 					continue;
@@ -213,11 +212,7 @@ public class AccountAcction extends ActionSupport {
 					}
 				}
 			}
-//			if (content.length() > 0) {
-//				content.deleteCharAt(content.length()-1);
-//			}
 		}
-//		content.insert(0, "[").append("]");
 		return new Result("/WEB-INF/jsp/result.jsp").addValue("result", "{\"status\":\"true\",\"desc\":\"success\"}");
 	}
 	
@@ -389,6 +384,9 @@ public class AccountAcction extends ActionSupport {
 		if (null != weiboList) {
 			Context context = getContext();
 			for (IWeibo w : weiboList) {
+				if (Utils.isStringEmpty(context.getRequestString(w.getWeiboId()))) {
+					continue;
+				}
 				Response response = w.statusesMentions(new MoreHomeTimelineParam(w, context));
 				String bodyString = null;
 				if (null != response) {

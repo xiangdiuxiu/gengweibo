@@ -1,5 +1,7 @@
-body{color:#000;background:#F9F9EF;overflow:auto;margin:0;padding:0;}body{font-size:12px;}body,input,select,button,textarea{font-family:verdana,sans-serif;}h1,h2,h3,h4,h5,h6,select,input,textarea,button,table{font-size:100%;}h1,h2,h3,h4,h5,h6,ul,ol,li,form,p,dl,dt,dd,table,th,td,img,blockquote{margin:0;padding:0;border:0;}input,button,textarea,img{line-height:normal;outline:0;}abbr,acronym,address,cite,q,em,code,var,dfn,ins{font-style:normal;text-decoration:none;border:0;}q:before,q:after{content:"";}ul,ol{list-style:none;}table{border-collapse:collapse;border-spacing:0;}select,input,button,button img,textarea,label,img{margin:0;vertical-align:middle;}
+body{color:#000;background:#F5F5F5;overflow:auto;margin:0;padding:0;}body{font-size:12px;}body,input,select,button,textarea{font-family:verdana,sans-serif;}h1,h2,h3,h4,h5,h6,select,input,textarea,button,table{font-size:100%;}h1,h2,h3,h4,h5,h6,ul,ol,li,form,p,dl,dt,dd,table,th,td,img,blockquote{margin:0;padding:0;border:0;}input,button,textarea,img{line-height:normal;outline:0;}abbr,acronym,address,cite,q,em,code,var,dfn,ins{font-style:normal;text-decoration:none;border:0;}q:before,q:after{content:"";}ul,ol{list-style:none;}table{border-collapse:collapse;border-spacing:0;}select,input,button,button img,textarea,label,img{margin:0;vertical-align:middle;}
 .page {margin-top:5px;width:950px;margin:0 auto;}
+
+/*#F9F9EF */
 	
 .header{height: 30px;overflow: hidden;}
 
@@ -45,11 +47,11 @@ margin-top: 20px;
 .item {
 padding: 10px 5px 10px 5px;
 overflow: hidden;
-border-bottom: solid 1px #DCDCDC;
+/*border-bottom: dashed 1px #DDDDDD;*/
 }
 
 .item:hover{
-background-color: #F5F5F5;
+/*background-color: #DDDDDD;*/
 cursor: default;
 }
 
@@ -69,9 +71,15 @@ width: 16px;
 height: 16px;
 }
 
-.itisimg img, .refImg img{
+.refImg img{
 width: 12px;
 height: 12px;
+border: 0px;
+}
+
+.itisimg img{
+width: 14px;
+height: 14px;
 border: 0px;
 }
 
@@ -87,7 +95,7 @@ margin-left: 5px;
 .userHeader {
 width: 48px;
 height: 48px;
-background-color: pink;
+/*background-color: pink;*/
 }
 
 .userName {
@@ -98,10 +106,15 @@ margin-right: 5px;
 .userHeader img {
 width: 48px;
 height: 48px;
+border-radius: 5px 5px 5px 5px;
 }
 
 .userItem {
-width: 880px;
+width: 860px;
+padding:5px 10px;
+border: solid 1px #DDDDDD;
+border-radius: 5px 5px 5px 5px;
+background-color: #DDDDDD;
 }
 
 .time {
@@ -111,17 +124,21 @@ margin-right: 5px;
 
 .status-0 {
 overflow: hidden;
+font-size: 14px;
 }
 
 .status-1 {
 margin-top: 5px;
+font-size: 14px;
 }
 
 .status-2 {
 margin-top: 5px;
-padding-top:5px;
+padding:5px 5px;
 font-size: 12px;
-border-top: solid 1px #DCDCDC;
+border: solid 1px #DDDDDD; /*#DCDCDC*/
+border-radius: 5px 5px 5px 5px;
+background-color: #F5F5F5;
 color: #999999;
 }
 
