@@ -115,6 +115,12 @@ public interface IWeibo {
 	Response statusesMentions(IParam param);
 	
 	/**
+	 * 获取我收到的评论列表
+	 * @param param 获取参数的接口，具体实现类根据实际需要从中获取
+	 */
+	Response statusesCommentsToMe(IParam param);
+	
+	/**
 	 * 评论一条微博
 	 * @param param 获取参数的接口，具体实现类根据实际需要从中获取
 	 */

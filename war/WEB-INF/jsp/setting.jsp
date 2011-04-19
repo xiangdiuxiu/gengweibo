@@ -11,7 +11,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css<jsp:include page="css_version.jsp" />" type="text/css" />
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/block.css" type="text/css" />
-<title>我的帐户</title>
+<title>设置</title>
 </head>
 <body>
 
@@ -19,8 +19,10 @@
 <div class='header'>
 	<a id='navMain' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=main' style='margin-left: 5px;'>我的主页</a>
 	<a id='navAtMe' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=atMe'>@我的</a>
-	<a id='navSetting' class='f-left headerA headerAOn' href='javascript:void(0);'>我的帐户</a>
+	<a id='navComments2Me' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=comments2Me'>我的评论</a>
+	
 	<a class='f-right headerA' href='<%=request.getContextPath()%>/execute.do?api=logout' style='margin-right: 0px;'>退出</a>
+	<a id='navSetting' class='f-right headerA headerAOn'>设置</a>
 </div>
 
 <div style="height:20px;"></div>

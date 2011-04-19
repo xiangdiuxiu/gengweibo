@@ -50,4 +50,14 @@ public class WeiboSina extends Weibo implements IWeibo {
 	public Response statusesCounts(IParam param) {
 		return sendRequest(toRequestParam("ids", param.getParamValue("statusIds")), urlResource + "statuses/counts.json", GET);
 	}
+	
+	public Response statusesCommentsToMe(IParam param) {
+		RequestParam reqParam = toRequestParam("count", parseLegalPageCount(param.getParamValue("count")));
+		
+		if (null != param.getParamValue("max_id")) {
+			reqParam.add("max_id", param.getParamValue("max_id"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "statuses/comments_to_me.json", GET);
+	}
 }

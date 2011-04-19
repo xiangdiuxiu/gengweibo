@@ -338,6 +338,18 @@ public abstract class Weibo implements IWeibo, Serializable {
 		
 		return sendRequest(reqParam, urlResource + "statuses/mentions.json", GET);
 	}
+	
+	public Response statusesCommentsToMe(IParam param) {
+		RequestParam reqParam = toRequestParam("count", parseLegalPageCount(param.getParamValue("count")));
+		
+		if (null != param.getParamValue("since_id")) {
+			reqParam.add("since_id", param.getParamValue("since_id"));
+		} 
+		
+		reqParam.add("trim_user", "false");
+		
+		return sendRequest(reqParam, urlResource + "statuses/comments_to_me.json", GET);
+	}
 
 	public boolean isSynUpdate() {
 		return synUpdate;

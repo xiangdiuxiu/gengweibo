@@ -14,10 +14,12 @@
 
 <div class="page">
 <div class='header'>
-	<a id='navMain' class='f-left headerA headerAOn' href='javascript:void(0);' style='margin-left: 5px;'>我的主页</a>
+	<a id='navMain' class='f-left headerA headerAOn' style='margin-left: 5px;'>我的主页</a>
 	<a id='navAtMe' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=atMe'>@我的</a>
-	<a id='navSetting' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=setting'>我的帐户</a>
+	<a id='navComments2Me' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=comments2Me'>我的评论</a>
+	
 	<a class='f-right headerA' href='<%=request.getContextPath()%>/execute.do?api=logout' style='margin-right: 0px;'>退出</a>
+	<a id='navSetting' class='f-right headerA' href='<%=request.getContextPath()%>/execute.do?api=setting'>设置</a>
 </div> 
 
 <div>

@@ -89,6 +89,11 @@ public class AccountAcction extends ActionSupport {
 		return new Result("/WEB-INF/jsp/atMe.jsp");
 	}
 	
+	@Api("comments2Me")
+	public Result comments2Me() {
+		return new Result("/WEB-INF/jsp/comments2Me.jsp");
+	}
+	
 	@Api("callback")
 	public Result callback() {
 		Account account = getCurrentAccount();
@@ -388,6 +393,58 @@ public class AccountAcction extends ActionSupport {
 					continue;
 				}
 				Response response = w.statusesMentions(new MoreHomeTimelineParam(w, context));
+				String bodyString = null;
+				if (null != response) {
+					bodyString = response.readBodyAsString();
+				}
+				content.append("{\"weiboId\":\"").append(w.getWeiboId()).append("\",\"list\":")
+				.append(bodyString).append(",\"weiboAccountName\":\"").append(w.getWeiboAccountName())
+				.append("\"},");
+			}
+			if (content.length() > 0) {
+				content.deleteCharAt(content.length()-1);
+			}
+		}
+		content.insert(0, "[").append("]");
+		return new Result("/WEB-INF/jsp/result.jsp").addValue("result", content.toString());
+	}
+	
+	@Api("statusesCommentsToMe")
+	public Result statusesCommentsToMe() {
+		Account account = getCurrentAccount();
+		StringBuilder content = new StringBuilder();
+		Collection<IWeibo> weiboList = account.getWeiboMap().values();
+		if (null != weiboList) {
+			for (IWeibo w : weiboList) {
+				Response response = w.statusesCommentsToMe(new WebParam(getContext()));
+				String bodyString = null;
+				if (null != response) {
+					bodyString = response.readBodyAsString();
+				}
+				content.append("{\"weiboId\":\"").append(w.getWeiboId()).append("\",\"list\":")
+				.append(bodyString).append(",\"weiboAccountName\":\"").append(w.getWeiboAccountName())
+				.append("\"},");
+			}
+			if (content.length() > 0) {
+				content.deleteCharAt(content.length()-1);
+			}
+		}
+		content.insert(0, "[").append("]");
+		return new Result("/WEB-INF/jsp/result.jsp").addValue("result", content.toString());
+	}
+	
+	@Api("moreStatusesCommentsToMe")
+	public Result moreStatusesCommentsToMe() {
+		Account account = getCurrentAccount();
+		StringBuilder content = new StringBuilder();
+		Collection<IWeibo> weiboList = account.getWeiboMap().values();
+		if (null != weiboList) {
+			Context context = getContext();
+			for (IWeibo w : weiboList) {
+				if (Utils.isStringEmpty(context.getRequestString(w.getWeiboId()))) {
+					continue;
+				}
+				Response response = w.statusesCommentsToMe(new MoreHomeTimelineParam(w, context));
 				String bodyString = null;
 				if (null != response) {
 					bodyString = response.readBodyAsString();

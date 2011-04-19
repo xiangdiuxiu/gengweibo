@@ -99,4 +99,24 @@ public class WeiboSohu extends Weibo implements IWeibo {
 		
 		return sendRequest(reqParam, urlResource + "statuses/transmit/" + id + ".json", POST);
 	}
+	
+	public Response statusesMentions(IParam param) {
+		RequestParam reqParam = toRequestParam("count", parseLegalPageCount(param.getParamValue("count")));
+		
+		if (null != param.getParamValue("max_id")) {
+			reqParam.add("max_id", param.getParamValue("max_id"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "statuses/mentions_timeline.json", GET);
+	}
+	
+	public Response statusesCommentsToMe(IParam param) {
+		RequestParam reqParam = toRequestParam("count", parseLegalPageCount(param.getParamValue("count")));
+		
+		if (null != param.getParamValue("max_id")) {
+			reqParam.add("max_id", param.getParamValue("max_id"));
+		}
+		
+		return sendRequest(reqParam, urlResource + "statuses/comments_timeline.json", GET);
+	}
 }

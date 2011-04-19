@@ -184,4 +184,9 @@ public class WeiboQQ extends Weibo implements IWeibo {
 		
 		return sendRequest(reqParam, urlResource + "statuses/mentions_timeline", GET);
 	}
+	
+	public Response statusesCommentsToMe(IParam param) {
+		// 腾讯无此api
+		return null;
+	}
 }

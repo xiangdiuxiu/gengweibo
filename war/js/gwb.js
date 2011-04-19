@@ -161,7 +161,7 @@ function viewStatusBigImg(tar) {
 	return tobeImpl();
 }
 
-function renderStatus() {
+function renderStatus(isComment) {
 	if (STATUS_CACHE.length < 1) {
 		return;
 	}
@@ -174,67 +174,109 @@ function renderStatus() {
 		maxLen = STATUS_CACHE.length;
 	} 
 	
-	//alert("maxLen:" + maxLen + ",STATUS_CACHE.length:" + STATUS_CACHE.length);
+	var sinaStatusCount = null;
+	var sohuStatusCount = null;
 	
-	var sinaStatusCount = {};
-	var sohuStatusCount = {};
-	
-	for (var i = 0; i < maxLen; i++) {
-		var local = STATUS_CACHE[i];
-		
-		if (local.weiboId.substring(0, 6) == "T_SINA") {
-			if (!sinaStatusCount[local.weiboId]) {
-				sinaStatusCount[local.weiboId] = "";
-			}
-			sinaStatusCount[local.weiboId] += (local.statusId + ",");
+	if (isComment) {
+		// TODO
+		for (var i = 0; i < maxLen; i++) {
+			var local = STATUS_CACHE[i];
 			
-		} else if (local.weiboId.substring(0, 6) == "T_SOHU") {
-			if (!sohuStatusCount[local.weiboId]) {
-				sohuStatusCount[local.weiboId] = "";
+			var createTime = formatFromTimestamp(local.timestamp);
+			
+			htmlArray.push("<div class='item' id='", local.weiboId, "XXX", local.statusId, "' rt='", local.rt, "'>");
+			htmlArray.push("<div class='item-1'><div title='", local.userName, "' class='userHeader f-left'><img alt='", local.userName, "' src='", local.userHeader, "' /></div>");
+			
+			htmlArray.push("<div class='userItem f-right'><div class='userStatus'>");
+			htmlArray.push("<div class='status-0'><div class='f-left'><span title='", local.userName, "' class='userName'>", local.userName, "</span></div><div class='time f-right'><span class='gray timestamp' timestamp='", local.timestamp, "'>", createTime, "</span></div>");
+			if (local.statusImg && "" != local.statusImg) {
+				htmlArray.push("<div imgSrc='", local.statusImg, "' title='点击看大图' class='itisimg f-right' onmouseover='viewStatusImg(this);' onmouseout='finishViewStatusImg(this);'><a href='javascript:void(0);' onclick='viewStatusBigImg(this);return false;'><img src='" + getContext() + "/css/itisimg.PNG' /></a></div>");
 			}
-			sohuStatusCount[local.weiboId] += (local.statusId + ",");
-		}
-		
-		var createTime = formatFromTimestamp(local.timestamp);
-		
-		htmlArray.push("<div class='item' id='", local.weiboId, "XXX", local.statusId, "' rt='", local.rt, "'>");
-		htmlArray.push("<div class='item-1'><div title='", local.userName, "' class='userHeader f-left'><img src='", local.userHeader, "' /></div>");
-		
-		htmlArray.push("<div class='userItem f-right'><div class='userStatus'>");
-		htmlArray.push("<div class='status-0'><div class='f-left'><span title='", local.userName, "' class='userName'>", local.userName, "</span></div><div class='time f-right'><span class='gray timestamp' timestamp='", local.timestamp, "'>", createTime, "</span></div>");
-		if (local.statusImg && "" != local.statusImg) {
-			htmlArray.push("<div imgSrc='", local.statusImg, "' title='点击看大图' class='itisimg f-right' onmouseover='viewStatusImg(this);' onmouseout='finishViewStatusImg(this);'><a href='javascript:void(0);' onclick='viewStatusBigImg(this);return false;'><img src='" + getContext() + "/css/itisimg.PNG' /></a></div>");
-		}
-		htmlArray.push("</div><div class='status-1'>", local.status, "</div>");
-		if ("" != local.statusRef && "" != local.statusRefUserName) {
-			var refUserNameSpan = "<span title='" + local.statusRefUserName + "' class='userName'>" + local.statusRefUserName + ":</span>";
-			var statusRefImg = "";
-			if (local.statusRefImg && "" != local.statusRefImg) {
-				statusRefImg = "<span imgSrc='" + local.statusRefImg + "' title='点击看大图' class='refImg' onmouseover='viewStatusImg(this);' onmouseout='finishViewStatusImg(this);'><a href='javascript:void(0);' onclick='viewStatusBigImg(this);return false;'><img src='" + getContext() + "/css/itisimg.PNG' /></a></span>";
+			htmlArray.push("</div><div class='status-1'>", local.status, "</div>");
+			if ("" != local.statusRef && "" != local.statusRefUserName) {
+				var refUserNameSpan = "<span title='" + local.statusRefUserName + "' class='userName'>" + local.statusRefUserName + ":</span>";
+				var statusRefImg = "";
+				if (local.statusRefImg && "" != local.statusRefImg) {
+					statusRefImg = "<span imgSrc='" + local.statusRefImg + "' title='点击看大图' class='refImg' onmouseover='viewStatusImg(this);' onmouseout='finishViewStatusImg(this);'><a href='javascript:void(0);' onclick='viewStatusBigImg(this);return false;'><img src='" + getContext() + "/css/itisimg.PNG' /></a></span>";
+				}
+				htmlArray.push("<div class='status-2'>", refUserNameSpan, local.statusRef, statusRefImg, "</div>");
 			}
-			htmlArray.push("<div class='status-2'>", refUserNameSpan, local.statusRef, statusRefImg, "</div>");
+			htmlArray.push("</div>");
+			
+			htmlArray.push("<div class='fromAndOpe'><div class='fromImg f-left'>", local.from, "</div>");
+			
+			var retweetNum = "";
+			var commentsNum = "";
+			if (local.retweetCount && "" != local.retweetCount && 0 != Number(local.retweetCount)) {
+				retweetNum = "(" + local.retweetCount + ")";
+			}
+			if (local.commentsCount && "" != local.commentsCount && 0 != Number(local.commentsCount)) {
+				commentsNum = "(" + local.commentsCount + ")";
+			}
+			htmlArray.push("<div class='operate f-right'><a class='aMarginRight' href='javascript:void(0);' onclick='statusesReply(this);'>回复", commentsNum, "</a></div>");
+			
+			htmlArray.push("</div></div></div></div>");
 		}
-		htmlArray.push("</div>");
 		
-		htmlArray.push("<div class='fromAndOpe'><div class='fromImg f-left'>", local.from, "</div>");
-		
-		var retweetNum = "";
-		var commentsNum = "";
-		if (local.retweetCount && "" != local.retweetCount && 0 != Number(local.retweetCount)) {
-			retweetNum = "(" + local.retweetCount + ")";
+	} else {
+		sinaStatusCount = {};
+		sohuStatusCount = {};
+		for (var i = 0; i < maxLen; i++) {
+			var local = STATUS_CACHE[i];
+			
+			if (local.weiboId.substring(0, 6) == "T_SINA") {
+				if (!sinaStatusCount[local.weiboId]) {
+					sinaStatusCount[local.weiboId] = "";
+				}
+				sinaStatusCount[local.weiboId] += (local.statusId + ",");
+				
+			} else if (local.weiboId.substring(0, 6) == "T_SOHU") {
+				if (!sohuStatusCount[local.weiboId]) {
+					sohuStatusCount[local.weiboId] = "";
+				}
+				sohuStatusCount[local.weiboId] += (local.statusId + ",");
+			}
+			
+			var createTime = formatFromTimestamp(local.timestamp);
+			
+			htmlArray.push("<div class='item' id='", local.weiboId, "XXX", local.statusId, "' rt='", local.rt, "'>");
+			htmlArray.push("<div class='item-1'><div title='", local.userName, "' class='userHeader f-left'><img alt='", local.userName, "' src='", local.userHeader, "' /></div>");
+			
+			htmlArray.push("<div class='userItem f-right'><div class='userStatus'>");
+			htmlArray.push("<div class='status-0'><div class='f-left'><span title='", local.userName, "' class='userName'>", local.userName, "</span></div><div class='time f-right'><span class='gray timestamp' timestamp='", local.timestamp, "'>", createTime, "</span></div>");
+			if (local.statusImg && "" != local.statusImg) {
+				htmlArray.push("<div imgSrc='", local.statusImg, "' title='点击看大图' class='itisimg f-right' onmouseover='viewStatusImg(this);' onmouseout='finishViewStatusImg(this);'><a href='javascript:void(0);' onclick='viewStatusBigImg(this);return false;'><img src='" + getContext() + "/css/itisimg.PNG' /></a></div>");
+			}
+			htmlArray.push("</div><div class='status-1'>", local.status, "</div>");
+			if ("" != local.statusRef && "" != local.statusRefUserName) {
+				var refUserNameSpan = "<span title='" + local.statusRefUserName + "' class='userName'>" + local.statusRefUserName + ":</span>";
+				var statusRefImg = "";
+				if (local.statusRefImg && "" != local.statusRefImg) {
+					statusRefImg = "<span imgSrc='" + local.statusRefImg + "' title='点击看大图' class='refImg' onmouseover='viewStatusImg(this);' onmouseout='finishViewStatusImg(this);'><a href='javascript:void(0);' onclick='viewStatusBigImg(this);return false;'><img src='" + getContext() + "/css/itisimg.PNG' /></a></span>";
+				}
+				htmlArray.push("<div class='status-2'>", refUserNameSpan, local.statusRef, statusRefImg, "</div>");
+			}
+			htmlArray.push("</div>");
+			
+			htmlArray.push("<div class='fromAndOpe'><div class='fromImg f-left'>", local.from, "</div>");
+			
+			var retweetNum = "";
+			var commentsNum = "";
+			if (local.retweetCount && "" != local.retweetCount && 0 != Number(local.retweetCount)) {
+				retweetNum = "(" + local.retweetCount + ")";
+			}
+			if (local.commentsCount && "" != local.commentsCount && 0 != Number(local.commentsCount)) {
+				commentsNum = "(" + local.commentsCount + ")";
+			}
+			htmlArray.push("<div class='operate f-right'><a class='aMarginRight' href='javascript:void(0);' onclick='statusesRetweet(this);'>转发", retweetNum, "</a><a class='aMarginRight' href='javascript:void(0);' onclick='statusesReply(this);'>评论", commentsNum, "</a><a class='aMarginRight' href='javascript:void(0);' onclick='favoritesCreate(this);'>收藏</a></div>");
+			
+			htmlArray.push("</div></div></div></div>");
 		}
-		if (local.commentsCount && "" != local.commentsCount && 0 != Number(local.commentsCount)) {
-			commentsNum = "(" + local.commentsCount + ")";
-		}
-		htmlArray.push("<div class='operate f-right'><a class='aMarginRight' href='javascript:void(0);' onclick='statusesRetweet(this);'>转发", retweetNum, "</a><a class='aMarginRight' href='javascript:void(0);' onclick='statusesReply(this);'>评论", commentsNum, "</a><a class='aMarginRight' href='javascript:void(0);' onclick='favoritesCreate(this);'>收藏</a></div>");
-		
-		htmlArray.push("</div></div></div></div>");
 	}
 	
 	var start = maxLen;
 	var end = STATUS_CACHE.length;
 	if (end > start) {
-		// TODO
 		STATUS_CACHE = STATUS_CACHE.slice(start, end);
 	}
 	
@@ -249,6 +291,12 @@ function renderStatus() {
 			$(this).html(formatFromTimestamp(timestamp));
 		});
 	}, 1000 * 10);
+	
+	$("#moreBtn").attr('value','查看更多').attr('disabled',false);
+	
+	if (isComment) {
+		return;
+	}
 	
 	var countSina = 0;
 	for (var i in sinaStatusCount) {
@@ -308,10 +356,9 @@ function renderStatus() {
 		}, 'json');
 	}
 	
-	$("#moreBtn").attr('value','查看更多').attr('disabled',false);
 }
 
-function loadStatus(url, argMap) {
+function loadStatus(url, argMap, isComment) {
 	$("#moreBtn").attr('value','正在加载数据...').attr('disabled',true);
 	if (!argMap) {
 		argMap = {};
@@ -329,7 +376,7 @@ function loadStatus(url, argMap) {
 				var weiboAccountName = weibo['weiboAccountName'];
 				var list = weibo['list'];
 				if (weiboId.substring(0, 4) == "T_QQ") {
-					if (list['data'] && 'ok' == list['msg']) {
+					if (list && list['data'] && 'ok' == list['msg']) {
 						list = list['data']['info'];
 					} else {
 						list = [];
@@ -352,129 +399,195 @@ function loadStatus(url, argMap) {
 					var commentsCount = null;
 					var rt = null; // 转发时，需要附带的内容
 					
-					if (weiboId.substring(0, 5) == "T_163") {
-						statusId = theWeibo['id'];
-						userHeader = theWeibo['user']['profile_image_url'];
-						userName = theWeibo['user']['name'];
-						var statusObj = convertStatus163(theWeibo['text']);
-						status = statusObj['status'];
-						statusImg = (statusObj['img'] || "");
-						statusRef = theWeibo['root_in_reply_to_status_text'] || "";
-						statusRefUserName = theWeibo['root_in_reply_to_user_name'] || "";
-						rt = "";
-						statusRefImg = "";
-						if (statusRef && "" != statusRef) {
-							var sr = convertStatus163(statusRef);
-							statusRef = sr['status'];
-							rt = " ||@" + userName + ": " + theWeibo['text'];
-							statusRefImg = (sr['img'] || "");
-						}
-						var createAt = theWeibo['created_at'];
-						var createAtArray = createAt.split(" ");
-						if (6 != createAtArray.length) {
-							continue;
-						}
-						createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
-						timestamp = new Date(createAt).getTime();
-						from = "<img src='" + getContext() + "/css/from163.png' title='内容来自网易微博[" + weiboAccountName + "]' />";
-						retweetCount = theWeibo['retweet_count'];
-						commentsCount = theWeibo['comments_count'];
-					
-					} else if (weiboId.substring(0, 6) == "T_SINA") {
-						statusId = theWeibo['id'];
-						
-						if (WEIBO_MAP[weiboId] && WEIBO_MAP[weiboId]['max_id'] && statusId == WEIBO_MAP[weiboId]['max_id']) {
-							// 剔除重复的
-							continue;
-						}
-						
-						userHeader = theWeibo['user']['profile_image_url'];
-						userName = theWeibo['user']['name'];
-						var statusObj = convertStatusSina(theWeibo['text']);
-						status = statusObj['status'];
-						
-//						thumbnail_pic: 缩略图
-//						bmiddle_pic: 中型图片
-//						original_pic：原始图片 
-						statusImg = (theWeibo['thumbnail_pic'] || "");
-						
-						statusRef = "";
-						statusRefUserName = "";
-						rt = "";
-						statusRefImg = "";
-						if (theWeibo['retweeted_status']) {
-							statusRef = convertStatusSina(theWeibo['retweeted_status']['text'])['status'];
-							statusRefUserName = theWeibo['retweeted_status']['user']['name'];
-							rt = " //@" + userName + ": " + theWeibo['text'];
-							statusRefImg = (theWeibo['retweeted_status']['thumbnail_pic'] || "");
-						}
-						var createAt = theWeibo['created_at'];
-						var createAtArray = createAt.split(" ");
-						if (6 != createAtArray.length) {
-							continue;
-						}
-						createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
-						timestamp = new Date(createAt).getTime();
-						from = "<img src='" + getContext() + "/css/fromsina.png' title='内容来自新浪微博[" + weiboAccountName + "]' />";
-						retweetCount = "";
-						commentsCount = "";
-						
-					} else if (weiboId.substring(0, 4) == "T_QQ") {
-						statusId = theWeibo['id'];
-						userHeader = theWeibo['head'];
-						userName = theWeibo['nick'];
-//						var statusObj = convertStatusQQ(theWeibo['text']);
-//						status = statusObj['status'];
-						status = theWeibo['text'];
-						statusImg = "";
-						if (theWeibo['image'] && theWeibo['image'].length > 0) {
-							statusImg = theWeibo['image'][0];
-						}
-						rt = "";
-						statusRefImg = "";
-						statusRef = "";
-						statusRefUserName = "";
-						if (theWeibo['source']) {
-							statusRef = theWeibo['source']['text'];
-							statusRefUserName = theWeibo['source']['nick'];
-							rt = " //@" + theWeibo['name'] + ": " + theWeibo['text'];
-							if (theWeibo['source']['image'] && theWeibo['source']['image'].length > 0) {
-								statusRefImg = theWeibo['source']['image'][0];
+					if (isComment) {
+						// 评论
+						if (weiboId.substring(0, 5) == "T_163") {
+							statusId = theWeibo['id'];
+							userHeader = theWeibo['user']['profile_image_url'];
+							userName = theWeibo['user']['name'];
+							status = theWeibo['text'];
+							statusRefUserName = theWeibo['in_reply_to_user_name'];
+							statusRef = theWeibo['in_reply_to_status_text'];
+							
+							var createAt = theWeibo['created_at'];
+							var createAtArray = createAt.split(" ");
+							if (6 != createAtArray.length) {
+								continue;
 							}
-						}
-						timestamp = Number(theWeibo['timestamp']) * 1000;
-						from = "<img src='" + getContext() + "/css/fromqq.png' title='内容来自腾讯微博[" + weiboAccountName + "]' />";
-						retweetCount = "";
-						commentsCount = theWeibo['count'];
-						
-					} else if (weiboId.substring(0, 6) == "T_SOHU") {
-						statusId = theWeibo['id'];
-						userHeader = theWeibo['user']['profile_image_url'];
-						userName = theWeibo['user']['screen_name'];
-						var statusObj = convertStatusSohu(theWeibo['text']); 
-						status = statusObj['status'];
-						statusImg = (theWeibo['small_pic'] || "");
-						statusRef = theWeibo['in_reply_to_status_text'] || "";
-						statusRefUserName = theWeibo['in_reply_to_screen_name'] || "";
-						rt = "";
-						statusRefImg = ""; // TODO in_reply_to_has_image=true？
-						if (statusRef && "" != statusRef) {
-							statusRef = convertStatusSohu(statusRef)['status'];
-							rt = " //@" + userName + ": " + theWeibo['text'];
-						}
-						var createAt = theWeibo['created_at'];
-						var createAtArray = createAt.split(" ");
-						if (6 != createAtArray.length) {
+							createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
+							timestamp = new Date(createAt).getTime();
+							from = "<img src='" + getContext() + "/css/from163.png' title='内容来自网易微博[" + weiboAccountName + "]' />";
+							
+						} else if (weiboId.substring(0, 6) == "T_SINA") {
+							statusId = theWeibo['id'];
+							userHeader = theWeibo['user']['profile_image_url'];
+							userName = theWeibo['user']['name'];
+							status = theWeibo['text'];
+							if (theWeibo['reply_comment']) {
+								statusRefUserName = theWeibo['reply_comment']['user']['name'];
+								statusRef = theWeibo['reply_comment']['text'];
+							} else {
+								statusRefUserName = theWeibo['status']['user']['name'];
+								statusRef = theWeibo['status']['text'];
+							}
+							
+							var createAt = theWeibo['created_at'];
+							var createAtArray = createAt.split(" ");
+							if (6 != createAtArray.length) {
+								continue;
+							}
+							createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
+							timestamp = new Date(createAt).getTime();
+							from = "<img src='" + getContext() + "/css/fromsina.png' title='内容来自新浪微博[" + weiboAccountName + "]' />";
+							
+							
+						} else if (weiboId.substring(0, 6) == "T_SOHU") {
+							statusId = theWeibo['id'];
+							userHeader = theWeibo['user']['profile_image_url'];
+							userName = theWeibo['user']['screen_name'];
+							status = theWeibo['text'];
+							statusRefUserName = theWeibo['in_reply_to_screen_name'];
+							statusRef = theWeibo['in_reply_to_status_text'];
+							
+							var createAt = theWeibo['created_at'];
+							var createAtArray = createAt.split(" ");
+							if (6 != createAtArray.length) {
+								continue;
+							}
+							createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
+							timestamp = new Date(createAt).getTime();
+							from = "<img src='" + getContext() + "/css/fromsohu.png' title='内容来自搜狐微博[" + weiboAccountName + "]' />";
+							
+						} else {
 							continue;
 						}
-						createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
-						timestamp = new Date(createAt).getTime();
-						from = "<img src='" + getContext() + "/css/fromsohu.png' title='内容来自搜狐微博[" + weiboAccountName + "]' />";
-						retweetCount = "";
-						commentsCount = "";
-					
+						
 					} else {
-						continue;
+						// 普通微博、@我的
+						if (weiboId.substring(0, 5) == "T_163") {
+							statusId = theWeibo['id'];
+							userHeader = theWeibo['user']['profile_image_url'];
+							userName = theWeibo['user']['name'];
+							var statusObj = convertStatus163(theWeibo['text']);
+							status = statusObj['status'];
+							statusImg = (statusObj['img'] || "");
+							statusRef = theWeibo['root_in_reply_to_status_text'] || "";
+							statusRefUserName = theWeibo['root_in_reply_to_user_name'] || "";
+							rt = "";
+							statusRefImg = "";
+							if (statusRef && "" != statusRef) {
+								var sr = convertStatus163(statusRef);
+								statusRef = sr['status'];
+								rt = " ||@" + userName + ": " + theWeibo['text'];
+								statusRefImg = (sr['img'] || "");
+							}
+							var createAt = theWeibo['created_at'];
+							var createAtArray = createAt.split(" ");
+							if (6 != createAtArray.length) {
+								continue;
+							}
+							createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
+							timestamp = new Date(createAt).getTime();
+							from = "<img src='" + getContext() + "/css/from163.png' title='内容来自网易微博[" + weiboAccountName + "]' />";
+							retweetCount = theWeibo['retweet_count'];
+							commentsCount = theWeibo['comments_count'];
+						
+						} else if (weiboId.substring(0, 6) == "T_SINA") {
+							statusId = theWeibo['id'];
+							
+							if (WEIBO_MAP[weiboId] && WEIBO_MAP[weiboId]['max_id'] && statusId == WEIBO_MAP[weiboId]['max_id']) {
+								// 剔除重复的
+								continue;
+							}
+							
+							userHeader = theWeibo['user']['profile_image_url'];
+							userName = theWeibo['user']['name'];
+							var statusObj = convertStatusSina(theWeibo['text']);
+							status = statusObj['status'];
+							
+//							thumbnail_pic: 缩略图
+//							bmiddle_pic: 中型图片
+//							original_pic：原始图片 
+							statusImg = (theWeibo['thumbnail_pic'] || "");
+							
+							statusRef = "";
+							statusRefUserName = "";
+							rt = "";
+							statusRefImg = "";
+							if (theWeibo['retweeted_status']) {
+								statusRef = convertStatusSina(theWeibo['retweeted_status']['text'])['status'];
+								statusRefUserName = theWeibo['retweeted_status']['user']['name'];
+								rt = " //@" + userName + ": " + theWeibo['text'];
+								statusRefImg = (theWeibo['retweeted_status']['thumbnail_pic'] || "");
+							}
+							var createAt = theWeibo['created_at'];
+							var createAtArray = createAt.split(" ");
+							if (6 != createAtArray.length) {
+								continue;
+							}
+							createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
+							timestamp = new Date(createAt).getTime();
+							from = "<img src='" + getContext() + "/css/fromsina.png' title='内容来自新浪微博[" + weiboAccountName + "]' />";
+							retweetCount = "";
+							commentsCount = "";
+							
+						} else if (weiboId.substring(0, 4) == "T_QQ") {
+							statusId = theWeibo['id'];
+							userHeader = theWeibo['head'];
+							userName = theWeibo['nick'];
+//							var statusObj = convertStatusQQ(theWeibo['text']);
+//							status = statusObj['status'];
+							status = theWeibo['text'];
+							statusImg = "";
+							if (theWeibo['image'] && theWeibo['image'].length > 0) {
+								statusImg = theWeibo['image'][0];
+							}
+							rt = "";
+							statusRefImg = "";
+							statusRef = "";
+							statusRefUserName = "";
+							if (theWeibo['source']) {
+								statusRef = theWeibo['source']['text'];
+								statusRefUserName = theWeibo['source']['nick'];
+								rt = " //@" + theWeibo['name'] + ": " + theWeibo['text'];
+								if (theWeibo['source']['image'] && theWeibo['source']['image'].length > 0) {
+									statusRefImg = theWeibo['source']['image'][0];
+								}
+							}
+							timestamp = Number(theWeibo['timestamp']) * 1000;
+							from = "<img src='" + getContext() + "/css/fromqq.png' title='内容来自腾讯微博[" + weiboAccountName + "]' />";
+							retweetCount = "";
+							commentsCount = theWeibo['count'];
+							
+						} else if (weiboId.substring(0, 6) == "T_SOHU") {
+							statusId = theWeibo['id'];
+							userHeader = theWeibo['user']['profile_image_url'];
+							userName = theWeibo['user']['screen_name'];
+							var statusObj = convertStatusSohu(theWeibo['text']); 
+							status = statusObj['status'];
+							statusImg = (theWeibo['small_pic'] || "");
+							statusRef = theWeibo['in_reply_to_status_text'] || "";
+							statusRefUserName = theWeibo['in_reply_to_screen_name'] || "";
+							rt = "";
+							statusRefImg = ""; // TODO in_reply_to_has_image=true？
+							if (statusRef && "" != statusRef) {
+								statusRef = convertStatusSohu(statusRef)['status'];
+								rt = " //@" + userName + ": " + theWeibo['text'];
+							}
+							var createAt = theWeibo['created_at'];
+							var createAtArray = createAt.split(" ");
+							if (6 != createAtArray.length) {
+								continue;
+							}
+							createAt = createAtArray[0] + " " + createAtArray[1] + " " + createAtArray[2] + " " + createAtArray[5] + " " + createAtArray[3] + " GMT" + createAtArray[4];
+							timestamp = new Date(createAt).getTime();
+							from = "<img src='" + getContext() + "/css/fromsohu.png' title='内容来自搜狐微博[" + weiboAccountName + "]' />";
+							retweetCount = "";
+							commentsCount = "";
+						
+						} else {
+							continue;
+						}
 					}
 					
 					STATUS_CACHE.push({
@@ -538,7 +651,7 @@ function loadStatus(url, argMap) {
 			STATUS_CACHE = sortLocalWeiboList(STATUS_CACHE);
 			
 			//////////////////////////////////////////////////////////////////////////////
-			renderStatus();
+			renderStatus(isComment);
 			
 		}
 		
@@ -547,7 +660,7 @@ function loadStatus(url, argMap) {
 	}, "json");
 }
 
-function moreStatuses(url) {
+function moreStatuses(url, isComment) {
 	var postArg = {};
 	var eachRemainCount = {};
 	for (var i in STATUS_CACHE) {
@@ -583,11 +696,11 @@ function moreStatuses(url) {
 		count++;
 	}
 	if (count > 0) {
-		loadStatus(getContext() + url, postArg);
+		loadStatus(getContext() + url, postArg, isComment);
 	} else {
 		if (STATUS_CACHE.length > 0) {
 			// render from cache
-			renderStatus();
+			renderStatus(isComment);
 		} else {
 			$("#moreItem").hide();
 			tipSuccess('没有更多的信息了!');
@@ -940,7 +1053,7 @@ function viewStatusImg(tar) {
 	if (imgSrc && "" != imgSrc) {
 		var dynamicImgDiv = $("#dynamicImgDiv");
 		if (dynamicImgDiv.length < 1) {
-			$("body").append("<div id='dynamicImgDiv' style='z-index:99;border:5px solid #DEDEDE;position:absolute;'></div>");
+			$("body").append("<div id='dynamicImgDiv' style='z-index:99;border:5px solid black;position:absolute;border-radius: 5px 5px 5px 5px;'></div>");
 			dynamicImgDiv = $("#dynamicImgDiv");
 		}
 		
@@ -963,10 +1076,13 @@ function viewStatusImg(tar) {
     	    	    	    		renderStatusImg(imgSrc, dynamicImgDiv, tarPostiton, image.width, image.height);
     	    	    	    		if (mouseIn && !finishLoadImg) { // 
     	    	    	    			renderStatusImg(imgSrc, dynamicImgDiv, tarPostiton, image.width, image.height);
+    	    	    	    			if (mouseIn && !finishLoadImg) { // 
+        	    	    	    			tipError("无法加载图片。");
+        	    	    	    		}
     	    	    	    		}
-    	    	    		    }, baseTimeout * 4);
+    	    	    		    }, baseTimeout * 2);
     	    	    		}
-    	    		    }, baseTimeout * 3);
+    	    		    }, baseTimeout * 2);
     	    		}
     		    }, baseTimeout * 2);
     		}
@@ -1026,3 +1142,20 @@ function changeSyn(tar) {
 		}
 	}, 'json');
 }
+
+function initCommentsPage() {
+	WEIBO_MAP = {};
+	STATUS_CACHE = null;
+	loadStatus(getContext() + '/execute.do?api=statusesCommentsToMe', null, true);
+	flushPage();
+}
+
+function commentsFlush() {
+	$("#items").html("");
+	initCommentsPage();
+}
+
+function moreStatuseComments() {
+	moreStatuses('/execute.do?api=moreStatusesCommentsToMe', true);
+}
+
