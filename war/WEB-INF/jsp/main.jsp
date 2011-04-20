@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>我的首页</title>
+<title>主页</title>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css<jsp:include page="css_version.jsp" />" type="text/css" />
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/jquery-impromptu.3.1.css" type="text/css" />
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/block.css" type="text/css" />
@@ -14,14 +14,20 @@
 
 <div class="page">
 <div class='header'>
-	<a id='navMain' class='f-left headerA headerAOn' style='margin-left: 5px;'>我的主页</a>
-	<a id='navAtMe' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=atMe'>@我的</a>
-	<a id='navComments2Me' class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=comments2Me'>我的评论</a>
-	
-	<a class='f-right headerA' href='<%=request.getContextPath()%>/execute.do?api=logout' style='margin-right: 0px;'>退出</a>
-	<a id='navSetting' class='f-right headerA' href='<%=request.getContextPath()%>/execute.do?api=setting'>设置</a>
+	<span class="f-left">
+		<a class='f-left headerA' style='margin-left: 5px;' href='javascript:void(0);' onclick="newStatuses();" title="发布新微博">发微博</a>
+		<a class='f-left headerA' href='javascript:void(0);' onclick="statusesFlush();" title='刷新我的主页'>刷新</a>
+	</span>
+	<span class="f-right">
+		<a class='f-left headerA headerAOn' title="我的主页">主页</a>
+		<a class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=atMe' title="@我的">@我的</a>
+		<a class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=comments2Me' title="我的评论">评论</a>
+		<a class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=setting' title="帐户设置">设置</a>
+		<a class='f-left headerA' href='<%=request.getContextPath()%>/execute.do?api=logout' style='margin-right: 0px;' title="退出本系统">退出</a>
+	</span>
 </div> 
 
+<%--
 <div>
 	<textarea id='statusTextarea' onkeyup='statusTextareaChange();'></textarea>
 </div>
@@ -34,8 +40,9 @@
 		<input class='mBtn' type="button" value="刷新" onclick='statusesFlush();' />
 	</div>
 </div>
+ --%>
 
-<div id='homeTimeline'>
+<div id='homeTimeline' class='itemWrapper'>
 	<div id='newItem' style="display: none;">
 		<input type="button" value="查看新微博" />
 	</div>

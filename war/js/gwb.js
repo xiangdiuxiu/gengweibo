@@ -725,30 +725,65 @@ function tipSuccess(msg) {
 	tip(msg);
 }
 
-function statusesUpdate() {
-	var status = $.trim($("#statusTextarea").val());
-	if (status && status.length > 0) {
-		if (status.length > 0 && status.length <= 140) {
-			wPost(getContext() + '/execute.do?api=statusesUpdate', {
-				'status' : encode(status)
-			}, function(data) {
-				if (data && 'true' == data['status']) {
-					tipSuccess("成功发布微博");
-				} else {
-					tipError("发布微博失败[" + data['desc'] + "]");
+//function statusesUpdate() {
+//	var status = $.trim($("#statusTextarea").val());
+//	if (status && status.length > 0) {
+//		if (status.length > 0 && status.length <= 140) {
+//			wPost(getContext() + '/execute.do?api=statusesUpdate', {
+//				'status' : encode(status)
+//			}, function(data) {
+//				if (data && 'true' == data['status']) {
+//					tipSuccess("成功发布微博");
+//				} else {
+//					tipError("发布微博失败[" + data['desc'] + "]");
+//				}
+//			}, 'json');
+//			resetTextarea();
+//		} else if (status.length < 1) {
+//			resetTextarea();
+//			tip("未输入内容！");
+//		} else {
+//			tipError("已经超出" + Math.abs(140 - status.length) + "个字");
+//		}
+//	} else {
+//		resetTextarea();
+//		tip("未输入内容！");
+//	}
+//}
+
+function newStatuses() {
+	var html = "<textarea id='statusTextarea' onclick='inputTxtClick(this);' onblur='inputTxtBlur(this);' gValue='说点啥呗' class='rArea' name='statusTextarea'>说点啥呗</textarea>";
+	$.prompt(html,{
+		callback: function(v, m, f){
+			if(v != undefined && 'submit' == v) {
+				var status = $.trim(f.statusTextarea);
+				if ("说点啥呗" == status) {
+					status = null;
 				}
-			}, 'json');
-			resetTextarea();
-		} else if (status.length < 1) {
-			resetTextarea();
-			tip("未输入内容！");
-		} else {
-			tipError("已经超出" + Math.abs(140 - status.length) + "个字");
-		}
-	} else {
-		resetTextarea();
-		tip("未输入内容！");
-	}
+				
+				if (!status || status.length < 1) {
+					tip("发布失败，未输入内容！"); 
+					return;
+				}
+				
+				if (status.length > 140) {
+					tipError("已经超出" + Math.abs(140 - status.length) + "个字");
+					return;
+				}
+				
+				wPost(getContext() + '/execute.do?api=statusesUpdate', {
+					'status' : encode(status)
+				}, function(data) {
+					if (data && 'true' == data['status']) {
+						tipSuccess("成功发布微博");
+					} else {
+						tipError("发布微博失败[" + data['desc'] + "]");
+					}
+				}, 'json');
+			}
+		},
+		buttons: { 发布微博: 'submit', 取消:'cancel' }
+	});
 }
 
 function statusTextareaChange() {
@@ -1053,7 +1088,7 @@ function viewStatusImg(tar) {
 	if (imgSrc && "" != imgSrc) {
 		var dynamicImgDiv = $("#dynamicImgDiv");
 		if (dynamicImgDiv.length < 1) {
-			$("body").append("<div id='dynamicImgDiv' style='z-index:99;border:5px solid black;position:absolute;border-radius: 5px 5px 5px 5px;'></div>");
+			$("body").append("<div id='dynamicImgDiv' style='z-index:99;border:5px solid #EFEFEF;position:absolute;border-radius: 5px 5px 5px 5px;'></div>");
 			dynamicImgDiv = $("#dynamicImgDiv");
 		}
 		

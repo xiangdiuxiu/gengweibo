@@ -27,9 +27,9 @@ margin-bottom: 30px;
 </style>
 <title>更微博 - 更简约的微博查看工具</title> 
 </head>
-<body><div class='page' style="width: 790px;">
+<body><div class='page' style="margin-top: 150px;width: 790px;padding: 5px 10px 15px 10px;">
 
-<div style="margin-top: 150px;font-size: 14px;">
+<div style="font-size: 14px;">
 
 <div style="text-indent: 2em;font-weight: bold;margin-bottom: 15px;font-size: 16px;">
 关于这个“更微博”小程序的一些说明，之前想要一款比较简便查看微博的工具，但是市面上没有我喜欢的，于是就想自己做一个玩玩了。以下是它的一些特点和缺点：
