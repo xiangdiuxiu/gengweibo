@@ -54,6 +54,14 @@
 	</div>
 </div>
 
+<div class='gFooter'>
+	&copy;&nbsp;
+	更简约的微博&nbsp;
+	开源项目&nbsp;
+	<a href='https://github.com/auzll/gengweibo' target="_blank">源码</a>&nbsp;
+	<a href="http://weibo.com/zhengll" target="_blank">联系</a>
+</div> 
+
 </div>
 
 </body>
