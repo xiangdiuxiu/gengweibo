@@ -15,7 +15,7 @@
 <div class="page">
 <div class='header'>
 	<span class="f-left">
-		<a class='f-left headerA' style='margin-left: 5px;' href='javascript:void(0);' onclick="newStatuses();" title="发布新微博">发微博</a>
+		<a class='f-left headerA' style='margin-left: 5px;' href='javascript:void(0);' onclick="newStatuses();" title="发布新微博">发布</a>
 		<a class='f-left headerA' href='javascript:void(0);' onclick="mentionsFlush();" title='刷新@我的'>刷新</a>
 	</span>
 	<span class="f-right">

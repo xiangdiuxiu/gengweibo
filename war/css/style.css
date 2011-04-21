@@ -1,5 +1,5 @@
 body{color:#000;background-color: #EFEFEF;overflow:auto;margin:0;padding:0;}body{font-size:12px;}body,input,select,button,textarea{font-family:verdana,sans-serif;}h1,h2,h3,h4,h5,h6,select,input,textarea,button,table{font-size:100%;}h1,h2,h3,h4,h5,h6,ul,ol,li,form,p,dl,dt,dd,table,th,td,img,blockquote{margin:0;padding:0;border:0;}input,button,textarea,img{line-height:normal;outline:0;}abbr,acronym,address,cite,q,em,code,var,dfn,ins{font-style:normal;text-decoration:none;border:0;}q:before,q:after{content:"";}ul,ol{list-style:none;}table{border-collapse:collapse;border-spacing:0;}select,input,button,button img,textarea,label,img{margin:0;vertical-align:middle;}
-.page {margin-top:5px;width:750px;margin:0 auto;
+.page {margin-top:5px;width:790px;margin:0 auto;
 -moz-box-shadow:2px 2px 5px #333333;
 -webkit-box-shadow:2px 2px 5px #333333;
 box-shadow:2px 2px 5px #333333;
@@ -8,8 +8,14 @@ background: #FFFFFF;
 /*background:url("bg.png") repeat fixed 0 0 transparent;*/
 /*#F9F9EF */
 	
-.header{overflow: hidden;background-color: #B9DBF8;padding:5px 5px;
-border-radius: 0px 0px 5px 5px;height: 25px; position: fixed;width: 740px;top: 0px;}
+.header{overflow: hidden;
+background-color: #000000; /*#B9DBF8*/
+padding:5px 5px;
+height: 25px; position: fixed;width: 780px;top: 0px;
+-moz-box-shadow:2px 2px 5px #333333;
+-webkit-box-shadow:2px 2px 5px #333333;
+box-shadow:2px 2px 5px #333333;
+}
 
 .headerA {
 padding-top:2px;
@@ -39,7 +45,7 @@ background: #FEF4B4;
 .headerAOn:hover {
 cursor: text;
 }
-	
+
 .f-left {float: left;} .f-right {float: right;}
 .gray {color: #999999;}
 .aMarginRight {margin-right: 5px;}
@@ -130,7 +136,7 @@ border-radius: 5px 5px 5px 5px;
 }
 
 .userItem {
-width: 650px;
+width: 690px;
 padding:5px 10px;
 border-radius: 5px 5px 5px 5px;
 /*background-color: #EFEFEF;*/
