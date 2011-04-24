@@ -12,58 +12,57 @@ import z.action.Common;
 import com.gengweibo.weibo.IWeibo;
 
 /**
- * 
  * @author auzll@msn.com
  * @since 2011-3-17
  */
 public class Account implements Serializable {
-	/**  */
-	private static final long serialVersionUID = 2608646627786083846L;
-	
-	/** 用户ID */
-	private String id;
-	
-	private Map<String, IWeibo> weiboMap = Common.newMap();
-	
-	private boolean init = false;
-	
-	public static final String ACCOUNT_SESSION_KEY = "__SESSION_ACCOUNT";
-	
-	private IWeibo linkingWeibo;
-	
-	public IWeibo getLinkingWeibo() {
-		return linkingWeibo;
-	}
+    /**  */
+    private static final long serialVersionUID = 2608646627786083846L;
 
-	public void setLinkingWeibo(IWeibo linkingWeibo) {
-		this.linkingWeibo = linkingWeibo;
-	}
-	
-	public Map<String, IWeibo> getWeiboMap() {
-		return weiboMap;
-	}
+    /** 用户ID */
+    private String id;
 
-	public String getId() {
-		return id;
-	}
+    private Map<String, IWeibo> weiboMap = Common.newMap();
 
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	public void loadWeibo(List<IWeibo> weiboList) {
-		if (!init) {
-			init = true;
-			if (null != weiboList) {
-				for (IWeibo w : weiboList) {
-					weiboMap.put(w.getWeiboId(), w);
-				}
-			}
-		}
-	}
+    private boolean init = false;
 
-	public boolean isInit() {
-		return init;
-	}
-	
+    public static final String ACCOUNT_SESSION_KEY = "__SESSION_ACCOUNT";
+
+    private IWeibo linkingWeibo;
+
+    public IWeibo getLinkingWeibo() {
+        return linkingWeibo;
+    }
+
+    public void setLinkingWeibo(IWeibo linkingWeibo) {
+        this.linkingWeibo = linkingWeibo;
+    }
+
+    public Map<String, IWeibo> getWeiboMap() {
+        return weiboMap;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void loadWeibo(List<IWeibo> weiboList) {
+        if (!init) {
+            init = true;
+            if (null != weiboList) {
+                for (IWeibo w: weiboList) {
+                    weiboMap.put(w.getWeiboId(), w);
+                }
+            }
+        }
+    }
+
+    public boolean isInit() {
+        return init;
+    }
+
 }

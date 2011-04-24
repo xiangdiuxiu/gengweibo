@@ -33,6 +33,14 @@ function getContext() {
 	return CONTEXT;
 }
 
+var AJAX_PREFIX = null;
+function getAjaxPrefix() {
+	if (!AJAX_PREFIX) {
+		AJAX_PREFIX = getContext() + '/execute.do?';
+	}
+	return AJAX_PREFIX;
+}
+
 function encode(value) {
 	return value;
 }
@@ -58,7 +66,7 @@ function flushPage() {
 	}
 	
 	flushPageInterval = setInterval(function() {
-		$.post(getContext() + '/execute.do?api=flush', {
+		$.post(getAjaxPrefix() + 'api=flush', {
 		}, function(data){
 			
 		}, "json");
@@ -304,7 +312,7 @@ function renderStatus(isComment) {
 		sinaStatusCount[i] = sinaStatusCount[i].substring(0, sinaStatusCount[i].length-1);
 	}
 	if (countSina > 0) {
-		$.post(getContext() + '/execute.do?api=sinaStatusesCounts',sinaStatusCount,function(data) {
+		$.post(getAjaxPrefix() + 'api=sinaStatusesCounts',sinaStatusCount,function(data) {
 			if (data) {
 				var sinaList = data;
 				for (var i in sinaList) {
@@ -333,7 +341,7 @@ function renderStatus(isComment) {
 		sohuStatusCount[i] = sohuStatusCount[i].substring(0, sohuStatusCount[i].length-1);
 	}
 	if (countSohu > 0) {
-		$.post(getContext() + '/execute.do?api=sohuStatusesCounts',sohuStatusCount,function(data) {
+		$.post(getAjaxPrefix() + 'api=sohuStatusesCounts',sohuStatusCount,function(data) {
 			if (data) {
 				var sohuList = data;
 				for (var i in sohuList) {
@@ -696,7 +704,7 @@ function moreStatuses(url, isComment) {
 		count++;
 	}
 	if (count > 0) {
-		loadStatus(getContext() + url, postArg, isComment);
+		loadStatus(getAjaxPrefix() + url, postArg, isComment);
 	} else {
 		if (STATUS_CACHE.length > 0) {
 			// render from cache
@@ -710,7 +718,7 @@ function moreStatuses(url, isComment) {
 }
 
 function moreHomeTimeline() {
-	moreStatuses('/execute.do?api=moreHomeTimeline');
+	moreStatuses('api=moreHomeTimeline');
 }
 
 function tip(msg) {
@@ -724,32 +732,6 @@ function tipError(msg) {
 function tipSuccess(msg) {
 	tip(msg);
 }
-
-//function statusesUpdate() {
-//	var status = $.trim($("#statusTextarea").val());
-//	if (status && status.length > 0) {
-//		if (status.length > 0 && status.length <= 140) {
-//			wPost(getContext() + '/execute.do?api=statusesUpdate', {
-//				'status' : encode(status)
-//			}, function(data) {
-//				if (data && 'true' == data['status']) {
-//					tipSuccess("成功发布微博");
-//				} else {
-//					tipError("发布微博失败[" + data['desc'] + "]");
-//				}
-//			}, 'json');
-//			resetTextarea();
-//		} else if (status.length < 1) {
-//			resetTextarea();
-//			tip("未输入内容！");
-//		} else {
-//			tipError("已经超出" + Math.abs(140 - status.length) + "个字");
-//		}
-//	} else {
-//		resetTextarea();
-//		tip("未输入内容！");
-//	}
-//}
 
 function newStatuses() {
 	var html = "<textarea id='statusTextarea' onclick='inputTxtClick(this);' onblur='inputTxtBlur(this);' gValue='说点啥呗' class='rArea' name='statusTextarea'>说点啥呗</textarea>";
@@ -771,7 +753,7 @@ function newStatuses() {
 					return;
 				}
 				
-				wPost(getContext() + '/execute.do?api=statusesUpdate', {
+				wPost(getAjaxPrefix() + 'api=statusesUpdate', {
 					'status' : encode(status)
 				}, function(data) {
 					if (data && 'true' == data['status']) {
@@ -847,7 +829,7 @@ function statusesRetweet(tar) {
 					postArg['status'] = encode(retweet);
 				}
 				
-				wPost(getContext() + '/execute.do?api=statusesRetweet', postArg, function(data) {
+				wPost(getAjaxPrefix() + 'api=statusesRetweet', postArg, function(data) {
 					if (data && 'true' == data['status']) {
 						tipSuccess("成功转发微博");
 					} else {
@@ -915,7 +897,7 @@ function moreReplys() {
 			return;
 		}
 		
-		$.post(getContext() + '/execute.do?api=statusesComments', postCommentsArg, function(data) {
+		$.post(getAjaxPrefix() + 'api=statusesComments', postCommentsArg, function(data) {
 			if (data) {
 				var weiboList = data;
 				if (weiboList.length > 0) {
@@ -1020,7 +1002,7 @@ function statusesReply(tar) {
 			if(v != undefined && 'submit' == v) {
 				var reply = $.trim(f.userReplyContent);
 				if (reply && '' != reply && '点击输入评论' != reply) {
-					wPost(getContext() + '/execute.do?api=statusesReply', {
+					wPost(getAjaxPrefix() + 'api=statusesReply', {
 						'weiboId' : ws.weiboId,
 						'statusId' : ws.statusId,
 						'status' : encode(reply)
@@ -1044,7 +1026,7 @@ function statusesReply(tar) {
 
 function favoritesCreate(tar) {
 	var ws = getWeiboIdAndStatusId(tar);
-	$.post(getContext() + '/execute.do?api=favoritesCreate', {
+	$.post(getAjaxPrefix() + 'api=favoritesCreate', {
 		'weiboId' : ws.weiboId,
 		'statusId' : ws.statusId
 	}, function(data) {
@@ -1139,7 +1121,7 @@ function finishViewStatusImg(tar) {
 function initMainPage() {
 	WEIBO_MAP = {};
 	STATUS_CACHE = null;
-	loadStatus(getContext() + '/execute.do?api=homeTimeline');
+	loadStatus(getAjaxPrefix() + 'api=homeTimeline');
 	flushPage();
 }
 
@@ -1156,17 +1138,17 @@ function mentionsFlush() {
 function initStatusesMentionsPage() {
 	WEIBO_MAP = {};
 	STATUS_CACHE = null;
-	loadStatus(getContext() + '/execute.do?api=statusesMentions');
+	loadStatus(getAjaxPrefix() + 'api=statusesMentions');
 	flushPage();
 }
 
 function moreStatusesMentions() {
-	moreStatuses('/execute.do?api=moreStatusesMentions');
+	moreStatuses('api=moreStatusesMentions');
 }
 
 function changeSyn(tar) {
 	var tarObj = $(tar);
-	$.post(getContext() + '/execute.do?api=synUpdate', {
+	$.post(getAjaxPrefix() + 'api=synUpdate', {
 		'weiboId' : tarObj.attr("weiboId"),
 		'syn' : tarObj.attr("checked")
 	}, function(data) {
@@ -1181,7 +1163,7 @@ function changeSyn(tar) {
 function initCommentsPage() {
 	WEIBO_MAP = {};
 	STATUS_CACHE = null;
-	loadStatus(getContext() + '/execute.do?api=statusesCommentsToMe', null, true);
+	loadStatus(getAjaxPrefix() + 'api=statusesCommentsToMe', null, true);
 	flushPage();
 }
 
@@ -1191,6 +1173,6 @@ function commentsFlush() {
 }
 
 function moreStatuseComments() {
-	moreStatuses('/execute.do?api=moreStatusesCommentsToMe', true);
+	moreStatuses('api=moreStatusesCommentsToMe', true);
 }
 
