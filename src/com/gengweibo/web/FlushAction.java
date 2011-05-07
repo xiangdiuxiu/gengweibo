@@ -4,8 +4,8 @@
 package com.gengweibo.web;
 
 import z.action.ActionSupport;
-import z.action.Api;
 import z.action.Result;
+import z.action.api.Api;
 
 /**
  * @author auzll@msn.com

@@ -7,9 +7,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import z.action.Common;
-
 import com.gengweibo.weibo.IWeibo;
+import com.google.inject.internal.Maps;
 
 /**
  * @author auzll@msn.com
@@ -22,7 +21,7 @@ public class Account implements Serializable {
     /** 用户ID */
     private String id;
 
-    private Map<String, IWeibo> weiboMap = Common.newMap();
+    private Map<String, IWeibo> weiboMap = Maps.newHashMap();
 
     private boolean init = false;
 

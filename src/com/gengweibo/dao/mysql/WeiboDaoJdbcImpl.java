@@ -190,8 +190,7 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
             conn = dataSource.getConnection();
 
             // 先尝试删除
-            pstmtQueryAccountId = conn
-                    .prepareStatement("select account_id from gwb_weibo where weibo_id=?");
+            pstmtQueryAccountId = conn.prepareStatement("select account_id from gwb_weibo where weibo_id=?");
             pstmtQueryAccountId.setString(1, weiboId);
             rsQueryAccountId = pstmtQueryAccountId.executeQuery();
             if (rsQueryAccountId.next()) {
@@ -206,19 +205,22 @@ public class WeiboDaoJdbcImpl implements WeiboDao {
                     String type = rsQueryWeibo.getString("type");
                     String accessToken = rsQueryWeibo.getString("access_token");
                     String tokenSecret = rsQueryWeibo.getString("token_secret");
-                    boolean synUpdate = Boolean.valueOf(rsQueryWeibo
-                            .getString("syn_update"));
+                    boolean synUpdate = Boolean.valueOf(rsQueryWeibo.getString("syn_update"));
 
-                    Weibo weibo = (Weibo) WeiboManager.newWeibo(WeiboType
-                            .of(type));
+                    Weibo weibo = (Weibo) WeiboManager.newWeibo(WeiboType.of(type));
                     weibo.setAccountId(accountId);
                     weibo.getAccessor().requestToken = null;
                     weibo.getAccessor().accessToken = accessToken;
                     weibo.getAccessor().tokenSecret = tokenSecret;
                     weibo.setSynUpdate(synUpdate);
-                    weibo.bindWeiboAccountContext();
-
-                    list.add(weibo);
+                    
+                    try {
+                        weibo.bindWeiboAccountContext();
+                        list.add(weibo);
+                    } catch (Exception e) {
+                        LOG.error("method:queryRelatedList,desc:fail", e);
+                    }
+                    
                 }
             }
 

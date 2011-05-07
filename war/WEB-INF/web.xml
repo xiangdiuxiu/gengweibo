@@ -19,6 +19,10 @@
 		<location>/error.jsp</location>
 	</error-page>
 	
+	<listener>
+		<listener-class>z.tool.util.Log4jConfigure</listener-class>
+	</listener>
+	
 	<filter>
 		<filter-name>SessionFilter</filter-name>
 		<filter-class>com.gengweibo.web.SessionFilter</filter-class>
@@ -26,24 +30,18 @@
 	
 	<filter-mapping>
 		<filter-name>SessionFilter</filter-name>
-		<url-pattern>/execute.do</url-pattern>
+		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
 	
 	<filter>
 		<filter-name>CharsetFilter</filter-name>
-		<filter-class>z.action.CharsetFilter</filter-class>
+		<filter-class>z.tool.util.CharsetFilter</filter-class>
 	</filter>
 	
 	<filter-mapping>
 		<filter-name>CharsetFilter</filter-name>
-		<url-pattern>/execute.do</url-pattern>
+		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
-	
-	<servlet>
-		<servlet-name>Log4jInit</servlet-name>
-		<servlet-class>z.action.Log4jInit</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
 	
 	<servlet>
 		<servlet-name>GuiceInit</servlet-name>
@@ -59,7 +57,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>Dispatcher</servlet-name>
-		<url-pattern>/execute.do</url-pattern>
+		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	
 	<welcome-file-list>

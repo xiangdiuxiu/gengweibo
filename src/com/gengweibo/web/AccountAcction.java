@@ -11,9 +11,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import z.action.ActionSupport;
-import z.action.Api;
 import z.action.Context;
 import z.action.Result;
+import z.action.api.Api;
 
 import com.gengweibo.dao.WeiboDao;
 import com.gengweibo.entity.Account;

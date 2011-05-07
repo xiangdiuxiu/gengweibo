@@ -6,19 +6,19 @@ package com.gengweibo.dao.mem;
 import java.util.List;
 import java.util.Map;
 
-import z.action.Common;
-
 import com.gengweibo.dao.WeiboDao;
 import com.gengweibo.weibo.IWeibo;
+import com.google.inject.internal.Lists;
+import com.google.inject.internal.Maps;
 
 /**
  * @author auzll@msn.com
  * @since 2011-3-18
  */
 public class WeiboDaoMemoryImpl implements WeiboDao {
-    private static final Map<String, List<IWeibo>> accountMap = Common.newMap();
+    private static final Map<String, List<IWeibo>> accountMap = Maps.newHashMap();
 
-    private static final Map<String, IWeibo> weiboMap = Common.newMap();
+    private static final Map<String, IWeibo> weiboMap = Maps.newHashMap();
 
     public void save(IWeibo weibo) {
         String accountId = weibo.getAccountId();
@@ -30,7 +30,7 @@ public class WeiboDaoMemoryImpl implements WeiboDao {
         weiboMap.put(weiboId, weibo);
         List<IWeibo> weiboList = accountMap.get(accountId);
         if (null == weiboList) {
-            weiboList = Common.newList();
+            weiboList = Lists.newArrayList();
             accountMap.put(accountId, weiboList);
         }
         weiboList.add(weibo);

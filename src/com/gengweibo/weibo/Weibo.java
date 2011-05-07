@@ -29,7 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import z.action.Common;
+import com.google.inject.internal.Lists;
+import com.google.inject.internal.Maps;
 
 /**
  * 微博接口的抽象实现。本实现是基于网易微博的，也就是说Weibo163这个类基本不用修改就能 使用；其余的WeiboQQ等等实现类需要做一些调整才能使用。
@@ -106,10 +107,8 @@ public abstract class Weibo implements IWeibo, Serializable {
         if (null == weiboId && null == weiboAccountName) {
             Response response = verifyCredentials();
             try {
-                JSONObject jsonObject = new JSONObject(
-                        response.readBodyAsString());
-                weiboId = getType().getEnName() + "_"
-                        + jsonObject.getString("id");
+                JSONObject jsonObject = new JSONObject(response.readBodyAsString());
+                weiboId = getType().getEnName() + "_" + jsonObject.getString("id");
                 weiboAccountName = jsonObject.getString("name");
             } catch (JSONException e) {
                 throw new WeiException(e);
@@ -122,7 +121,7 @@ public abstract class Weibo implements IWeibo, Serializable {
         if (null == accessor.requestToken) {
             throw new NullPointerException("accessor.requestToken is null");
         }
-        Map<String, String> map = Common.newMap();
+        Map<String, String> map = Maps.newHashMap();
         map.put("oauth_token", accessor.requestToken);
         if (null != oauth_verifier) {
             map.put("oauth_verifier", oauth_verifier);
@@ -192,7 +191,7 @@ public abstract class Weibo implements IWeibo, Serializable {
             throw new WeiException(e);
         }
 
-        Collection<Parameter> parameters = Common.newList();
+        Collection<Parameter> parameters = Lists.newArrayList();
         parameters.add(new Parameter("oauth_token", accessor.requestToken));
         if (null != accessor.consumer.callbackURL) {
             parameters.add(new Parameter("oauth_callback",
@@ -272,8 +271,7 @@ public abstract class Weibo implements IWeibo, Serializable {
 
     public Response statusesUpdate(IParam param) {
         String status = param.getParamValue("status");
-        return sendRequest(toRequestParam("status", status), urlResource
-                + "statuses/update.json", POST);
+        return sendRequest(toRequestParam("status", status), urlResource + "statuses/update.json", POST);
     }
 
     public Response verifyCredentials() {
@@ -288,7 +286,7 @@ public abstract class Weibo implements IWeibo, Serializable {
         try {
             List<Map.Entry<?, ?>> params = null;
             if (null != map) {
-                params = Common.newList();
+                params = Lists.newArrayList();
                 Iterator<?> it = map.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<?, ?> p = (Map.Entry<?, ?>) it.next();
@@ -298,19 +296,15 @@ public abstract class Weibo implements IWeibo, Serializable {
             }
 
             OAuthClient client = new OAuthClient(new URLConnectionClient());
-            // return new Response(client.invoke(accessor, method.toString(),
-            // url, params));
 
             int tryTimes = 0;
             while (tryTimes < MAX_RETRY_TIMES) {
                 try {
                     tryTimes++;
-                    return new Response(client.invoke(accessor,
-                            method.toString(), url, params));
-                } catch (RuntimeException e) {
-                    // 底下是IOException，但是被RuntimeException包装了一层，所以这里如果是RuntimeException就重试
+                    return new Response(client.invoke(accessor, method.toString(), url, params));
+                } catch (Exception e) {
                     // 最多重试MAX_RETRY_TIMES
-                    LOG.error("method:sendRequest,tryTimes:" + tryTimes, e);
+                    LOG.error("method:sendRequest,url:" + url + ",tryTimes:" + tryTimes);
                     if (tryTimes >= MAX_RETRY_TIMES) {
                         throw e;
                     }

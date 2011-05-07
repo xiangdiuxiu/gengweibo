@@ -6,8 +6,7 @@ package com.gengweibo.weibo;
 import java.util.List;
 
 import com.gengweibo.util.Utils;
-
-import z.action.Common;
+import com.google.inject.internal.Lists;
 
 /**
  * @author auzll@msn.com
@@ -37,7 +36,7 @@ public enum WeiboType {
 
     public static WeiboType[] getPublicTypes() {
         if (null == weiboTypeArray) {
-            List<WeiboType> list = Common.newList();
+            List<WeiboType> list = Lists.newArrayList();
             if (!Utils.isStringEmpty(OAuthProperty.CONSUMER_KEY_163)
                     && !Utils.isStringEmpty(OAuthProperty.CONSUMER_SECRET_163)) {
                 list.add(T_163);

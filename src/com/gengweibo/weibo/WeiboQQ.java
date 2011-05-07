@@ -22,7 +22,7 @@ import net.oauth.http.HttpMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import z.action.Common;
+import com.google.inject.internal.Lists;
 
 /**
  * @author auzll@msn.com
@@ -83,7 +83,7 @@ public class WeiboQQ extends Weibo implements IWeibo {
     public String makeClickUrl() throws WeiException {
         OAuthClient client = new OAuthClient(new URLConnectionClient());
         try {
-            List<Map.Entry<?, ?>> parameters = Common.newList();
+            List<Map.Entry<?, ?>> parameters = Lists.newArrayList();
             String callback = accessor.consumer.callbackURL;
             if (null == callback) {
                 callback = "null";
@@ -94,7 +94,7 @@ public class WeiboQQ extends Weibo implements IWeibo {
             throw new WeiException(e);
         }
 
-        Collection<Parameter> parameters = Common.newList();
+        Collection<Parameter> parameters = Lists.newArrayList();
         parameters.add(new Parameter("oauth_token", accessor.requestToken));
 
         try {
